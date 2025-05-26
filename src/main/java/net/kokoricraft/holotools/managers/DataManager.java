@@ -193,13 +193,6 @@ public class DataManager {
             jsonObject.addProperty("slot_" + slot, content.getToJson().toString());
         }
 
-        if(plugin.getConfigManager().STORAGE_MODE == StorageMode.ITEM){
-            meta.getPersistentDataContainer().set(WARDROBE_KEY, PersistentDataType.STRING, jsonObject.toString());
-
-            if(plugin.getHoloManager().isHolo(player.getInventory().getItemInMainHand()))
-                player.getInventory().setItemInMainHand(itemStack);
-        }
-
         if(plugin.getConfigManager().STORAGE_MODE == StorageMode.PLAYER){
             HoloPlayer holoPlayer = plugin.getPlayerManager().getPlayer(player);
             holoPlayer.setData("holo_wardrobe", jsonObject);
@@ -208,9 +201,21 @@ public class DataManager {
 
         if(plugin.getConfigManager().STORAGE_MODE == StorageMode.UUID){
             storage.saveHolo(id, jsonObject);
+
+            itemStack.setItemMeta(meta);
+
+            if(plugin.getHoloManager().isHolo(player.getInventory().getItemInMainHand()))
+                player.getInventory().setItemInMainHand(itemStack);
         }
 
-        itemStack.setItemMeta(meta);
+        if(plugin.getConfigManager().STORAGE_MODE == StorageMode.ITEM){
+            meta.getPersistentDataContainer().set(WARDROBE_KEY, PersistentDataType.STRING, jsonObject.toString());
+
+            itemStack.setItemMeta(meta);
+
+            if(plugin.getHoloManager().isHolo(player.getInventory().getItemInMainHand()))
+                player.getInventory().setItemInMainHand(itemStack);
+        }
     }
 
     public HoloWardrobe loadHoloWardrobe(Player player, ItemStack itemStack){
