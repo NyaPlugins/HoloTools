@@ -153,24 +153,64 @@ public class ConfigManager {
         return colors;
     }
 
-    private Map<String, DualColor> getColors(NekoConfig config){
+    private Map<String, DualColor> getColors(NekoConfig config) {
         Map<String, DualColor> colorMap = new HashMap<>();
         ConfigurationSection section = config.getConfigurationSection("colors_lists");
-        if(section != null){
-            for(String name : section.getKeys(false)){
-                String selected_hex = section.getString(name+".selected.hex", "#ffffff");
-                int selected_opacity = section.getInt(name+".selected.alpha", 3);
 
-                String unselected_hex = section.getString(name+".unselected.hex", "#ffffff");
-                int unselected_opacity = section.getInt(name+".unselected.alpha", 3);
+        if (section != null) {
+            for (String name : section.getKeys(false)) {
+                ConfigurationSection selectedSection = section.getConfigurationSection(name + ".selected");
+                ConfigurationSection unselectedSection = section.getConfigurationSection(name + ".unselected");
 
+                HoloColor selectedColor = parseColorSection(selectedSection);
+                HoloColor unselectedColor = parseColorSection(unselectedSection);
 
-                DualColor color = new DualColor(HoloColor.fromHex(selected_hex, selected_opacity),
-                        HoloColor.fromHex(unselected_hex, unselected_opacity));
-
-                colorMap.put(name, color);
+                colorMap.put(name, new DualColor(selectedColor, unselectedColor));
             }
         }
+
         return colorMap;
+    }
+
+    private HoloColor parseColorSection(ConfigurationSection section) {
+        if (section == null) return HoloColor.fromHex("#ffffff", 3);
+
+        if (section.contains("sequence")) {
+            List<Map<?, ?>> sequenceList = section.getMapList("sequence");
+            if (sequenceList.isEmpty()) return HoloColor.fromHex("#ffffff", 3);
+
+            Map<?, ?> first = sequenceList.get(0);
+            String hex = String.valueOf(first.get("hex"));
+            int alpha = parseInt(first.get("alpha"));
+            HoloColor color = HoloColor.fromHex(hex, alpha);
+
+            for (Map<?, ?> entry : sequenceList) {
+                String entryHex = String.valueOf(entry.get("hex"));
+                int entryAlpha = parseInt(entry.get("alpha"));
+                int duration = parseInt(entry.get("duration"));
+
+                HoloColor timed = HoloColor.fromHex(entryHex, entryAlpha);
+                color.addToSequence(timed, duration);
+            }
+
+            return color;
+        } else {
+            String hex = section.getString("hex", "#ffffff");
+            int alpha = section.getInt("alpha", 255);
+            return HoloColor.fromHex(hex, alpha);
+        }
+    }
+
+    private int parseInt(Object value) {
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        if (value instanceof String) {
+            try {
+                return Integer.parseInt((String) value);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return 255;
     }
 }

@@ -360,6 +360,13 @@ public class v1_19_R3 implements Compat{
         }
 
         @Override
+        public void interpolation(int delay, int duration) {
+            Display display = textDisplay;
+            display.c(delay);
+            display.b(duration);
+        }
+
+        @Override
         public void mount(org.bukkit.entity.Entity target) {
             this.target = target;
             manager.mount(players, target, textDisplay);
@@ -510,6 +517,13 @@ public class v1_19_R3 implements Compat{
         public void setBrightness(org.bukkit.entity.Display.Brightness bukkitBrightness) {
             Brightness brightness = new Brightness(bukkitBrightness.getBlockLight(), bukkitBrightness.getSkyLight());
             itemDisplay.a(brightness);
+        }
+
+        @Override
+        public void interpolation(int delay, int duration) {
+            Display display = itemDisplay;
+            display.c(delay);
+            display.b(duration);
         }
 
         public void internalUpdate(){

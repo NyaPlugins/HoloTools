@@ -22,6 +22,53 @@ colors:
       slot_6: blue
 
 colors_lists:
+  rainbow:
+    unselected:
+      sequence:
+        - hex: "#ff0000"
+          alpha: 180
+          duration: 5
+        - hex: "#ff7f00"
+          alpha: 180
+          duration: 5
+        - hex: "#ffff00"
+          alpha: 180
+          duration: 5
+        - hex: "#00ff00"
+          alpha: 180
+          duration: 5
+        - hex: "#0000ff"
+          alpha: 180
+          duration: 5
+        - hex: "#4b0082"
+          alpha: 180
+          duration: 5
+        - hex: "#8f00ff"
+          alpha: 180
+          duration: 5
+    selected:
+      sequence:
+        - hex: "#ff4dd6"
+          alpha: 220
+          duration: 5
+        - hex: "#ffb84d"
+          alpha: 220
+          duration: 5
+        - hex: "#ffff66"
+          alpha: 220
+          duration: 5
+        - hex: "#66ff66"
+          alpha: 220
+          duration: 5
+        - hex: "#6699ff"
+          alpha: 220
+          duration: 5
+        - hex: "#a64dff"
+          alpha: 220
+          duration: 5
+        - hex: "#cc66ff"
+          alpha: 220
+          duration: 5
   red:
     unselected:
       hex: "#24dce5"

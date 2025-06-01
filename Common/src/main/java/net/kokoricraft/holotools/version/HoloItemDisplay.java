@@ -21,4 +21,5 @@ public interface HoloItemDisplay {
     void setBillboard(Display.Billboard billboard);
     void setViewRange(float range);
     void setBrightness(Display.Brightness brightness);
+    void interpolation(int delay, int duration);
 }

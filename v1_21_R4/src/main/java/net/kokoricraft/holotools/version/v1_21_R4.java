@@ -354,6 +354,13 @@ public class v1_21_R4 implements Compat{
         }
 
         @Override
+        public void interpolation(int delay, int duration) {
+            Display display = textDisplay;
+            display.c(delay);
+            display.b(duration);
+        }
+
+        @Override
         public void setColor(HoloColor color) {
             int colorValue = color == null ? -1 : color.asARGB();
             manager.getDataWatcher(textDisplay).a(Display.TextDisplay.aJ, colorValue);
@@ -616,6 +623,12 @@ public class v1_21_R4 implements Compat{
         public void setBrightness(org.bukkit.entity.Display.Brightness bukkitBrightness) {
             Brightness brightness = new Brightness(bukkitBrightness.getBlockLight(), bukkitBrightness.getSkyLight());
             itemDisplay.a(brightness);
+        }
+
+        @Override
+        public void interpolation(int delay, int duration) {
+            itemDisplay.c(delay);
+            itemDisplay.b(duration);
         }
 
         public void internalUpdate(){

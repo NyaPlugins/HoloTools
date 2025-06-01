@@ -2,14 +2,12 @@ package net.kokoricraft.holotools.objects.holocrafter;
 
 import net.kokoricraft.holotools.HoloTools;
 import net.kokoricraft.holotools.enums.HoloActionType;
-import net.kokoricraft.holotools.enums.HoloColors;
 import net.kokoricraft.holotools.enums.HoloType;
 import net.kokoricraft.holotools.interfaces.HoloBase;
 import net.kokoricraft.holotools.objects.colors.DualColor;
 import net.kokoricraft.holotools.objects.colors.HoloPanelsColors;
 import net.kokoricraft.holotools.objects.halo.HaloSlot;
 import net.kokoricraft.holotools.objects.halo.Holo;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -31,7 +29,7 @@ public class HoloCrafter extends Holo implements HoloBase {
 
         colors = plugin.getHoloManager().getHoloColor(player, HoloType.HOLOCRAFTER);
 
-        for(int key : slots.keySet()){
+        for (int key : slots.keySet()) {
             HaloSlot slot = slots.get(key);
 
             DualColor dualColor = colors.getColor(slot.getSlot());
@@ -53,30 +51,34 @@ public class HoloCrafter extends Holo implements HoloBase {
         HaloSlot from = slots.get(fromSlot);
         HaloSlot to = slots.get(toSlot);
 
-        if(from != null){
+        if (from != null) {
             HoloCrafterSlot holoCrafterSlot = crafterSlots.get(fromSlot);
+            from.removeExtraY();
             from.setColor(colors.getColor(fromSlot).unselected());
-            if(fromSlot != 0){
+            if (fromSlot != 0){
                 hover.setAir();
                 holoCrafterSlot.setText(" ");
             }
         }
 
-        if(to != null){
+        if (to != null) {
             HoloCrafterSlot holoCrafterSlot = crafterSlots.get(toSlot);
+            to.addExtraYSize(0.45f);
+            to.setIgnoreColorChange(5);
             to.setColor(colors.getColor(toSlot).selected());
-            if(toSlot != 0){
-                if(holoCrafterSlot.getRecipe() != null){
+
+            if (toSlot != 0){
+                if (holoCrafterSlot.getRecipe() != null) {
                     hover.setRecipe(holoCrafterSlot.getRecipe());
                     holoCrafterSlot.setText(plugin.getUtils().color(plugin.getLangManager().CRAFTER_CLICK_TO_CRAFT));
-                }else if(lasted_recipe != null){
+                } else if(lasted_recipe != null) {
                     hover.setRecipe(lasted_recipe);
                     holoCrafterSlot.setText(plugin.getUtils().color(plugin.getLangManager().CRAFTER_CLICK_TO_SAVE));
                 }
             }
         }
 
-        if(toSlot == 0)
+        if (toSlot == 0)
             hover.setAir();
     }
 
@@ -84,32 +86,32 @@ public class HoloCrafter extends Holo implements HoloBase {
     public void onClick() {
         super.onClick();
         int slot = getSlot();
-        if(slot == 0){
+        if (slot == 0) {
             InventoryView view = player.openWorkbench(null, true);
             return;
         }
 
         HoloCrafterSlot crafterSlot = crafterSlots.get(slot);
 
-        if(crafterSlot.getRecipe() != null && !player.isSneaking()){
+        if (crafterSlot.getRecipe() != null && !player.isSneaking()) {
             plugin.getCraftItemsUtils().craftItems(player, crafterSlot.getRecipe(), 1);
             return;
         }
 
-        if(crafterSlot.getRecipe() != null && player.isSneaking()){
+        if (crafterSlot.getRecipe() != null && player.isSneaking()) {
             crafterSlot.setRecipe(null);
             hover.setAir();
             plugin.getDataManager().saveHoloCrafter(itemStack, this, "remove recipe");
-            if(lasted_recipe != null){
+            if(lasted_recipe != null) {
                 crafterSlot.setText(plugin.getUtils().color(plugin.getLangManager().CRAFTER_CLICK_TO_SAVE));
-            }else{
+            } else {
                 crafterSlot.setText(" ");
             }
 
             return;
         }
 
-        if(lasted_recipe != null && crafterSlot.getRecipe() == null){
+        if (lasted_recipe != null && crafterSlot.getRecipe() == null) {
             crafterSlot.setRecipe(lasted_recipe);
             hover.setRecipe(lasted_recipe);
             crafterSlot.setText(plugin.getUtils().color(plugin.getLangManager().CRAFTER_CLICK_TO_CRAFT));
@@ -118,12 +120,12 @@ public class HoloCrafter extends Holo implements HoloBase {
     }
 
     @Override
-    public void onAction(HoloActionType type){
+    public void onAction(HoloActionType type) {
         HoloCrafterSlot crafterSlot = crafterSlots.get(getSlot());
         if(type != HoloActionType.SNEAK) return;
         boolean isSneaking = !player.isSneaking();
 
-        if(crafterSlot.getRecipe() != null){
+        if (crafterSlot.getRecipe() != null) {
             crafterSlot.setText(plugin.getUtils().color(isSneaking ?
                     plugin.getLangManager().CRAFTER_CLICK_TO_REMOVE : plugin.getLangManager().CRAFTER_CLICK_TO_CRAFT));
         }
@@ -136,19 +138,19 @@ public class HoloCrafter extends Holo implements HoloBase {
 
     @Override
     public void setVisible(boolean visible) {
-        if(!this.visible && visible)
+        if (!this.visible && visible)
             plugin.getTickManager().addTickable(this);
 
         this.visible = visible;
-        if(visible){
+        if (visible){
             spawn(player);
             hover.spawn(player);
             crafterSlots.values().forEach(HoloCrafterSlot::spawn);
-        }else {
+        } else {
             this.shouldRemove = true;
             remove("holo crafter set visible false");
 
-            if(hover != null)
+            if (hover != null)
                 hover.removeEntities();
         }
     }

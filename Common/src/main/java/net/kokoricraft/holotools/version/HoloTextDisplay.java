@@ -32,4 +32,5 @@ public interface HoloTextDisplay {
     void setViewRange(float range);
     void setTextOpacity(byte opacity);
     void setText(List<BaseComponent> components);
+    void interpolation(int delay, int duration);
 }

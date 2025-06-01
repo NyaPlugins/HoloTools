@@ -146,6 +146,7 @@ public class Utils {
 
     public TextComponent getTextComponent(String text) {
         TextComponent base = new TextComponent();
+        base.setItalic(false);
 
         String color = null;
         for(String part : hexSeparator(text)) {

@@ -4,7 +4,6 @@ import net.kokoricraft.holotools.HoloTools;
 import net.kokoricraft.holotools.enums.HoloSize;
 import net.kokoricraft.holotools.interfaces.HoloBase;
 import net.kokoricraft.holotools.interfaces.Tickable;
-import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -81,6 +80,8 @@ public abstract class Holo implements Tickable, HoloBase{
             onChangeSlot(last_slot, slot);
             last_slot = slot;
         }
+
+        slots.values().forEach(HaloSlot::tick);
     }
 
     public int getPlayerSlot(){

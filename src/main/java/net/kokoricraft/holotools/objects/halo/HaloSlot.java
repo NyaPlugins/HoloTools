@@ -1,6 +1,5 @@
 package net.kokoricraft.holotools.objects.halo;
 
-import com.google.common.collect.Lists;
 import net.kokoricraft.holotools.HoloTools;
 import net.kokoricraft.holotools.utils.objects.HoloColor;
 import net.kokoricraft.holotools.version.HoloItemDisplay;
@@ -12,7 +11,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class HaloSlot {
     private final int slot;
@@ -27,8 +25,12 @@ public class HaloSlot {
     private final Map<String, HoloItemDisplay> itemDisplayMap = new HashMap<>();
     private final Map<String, HoloTextDisplay> textDisplayMap = new HashMap<>();
     private final HoloTools plugin = JavaPlugin.getPlugin(HoloTools.class);
-    private HoloColor color = HoloColor.fromARGB(150, 25, 167, 210);
+    private HoloColor defColor = HoloColor.fromARGB(150, 25, 167, 210);
+    private HoloColor color;
     private final Holo holo;
+    private int tick = 0;
+    private HoloColor lastAppliedColor = null;
+    private int ignoreColorChange = 0;
 
     public HaloSlot(int slot, double x, double y, double z, float x_size, float y_size, float z_size, float rotation, Holo holo) {
         this.slot = slot;
@@ -52,7 +54,7 @@ public class HaloSlot {
         background.setScale(x_size, y_size, z_size);
         background.setText(" ");
         background.setBrightness(new Display.Brightness(15, 15));
-        background.setColor(color);
+        background.setColor(defColor);
         background.update();
         background.mount(player);
     }
@@ -66,13 +68,52 @@ public class HaloSlot {
     }
 
     public void setColor(HoloColor color){
+        this.color = color;
         if(background == null){
-            this.color = color;
+            this.defColor = color;
             return;
         }
 
         background.setColor(color);
+        background.interpolation(-1, 4);
         background.update();
+    }
+
+    private void setInternalColor(HoloColor color, int duration) {
+        if (ignoreColorChange > 0) return;
+        background.setColor(color);
+        background.interpolation(-1, duration);
+        background.update();
+    }
+
+    public void addExtraYSize(float extraY) {
+        background.setScale(x_size, y_size + extraY, z_size);
+    }
+
+    public void removeExtraY() {
+        background.setScale(x_size, y_size, z_size);
+    }
+
+    public void tick() {
+        if (color != null && background != null) {
+            HoloColor.TimedColor timedColor = color.getColor(tick);
+
+            if (timedColor != null) {
+                HoloColor next = timedColor.color();
+
+                if (lastAppliedColor == null || next.asARGB() != lastAppliedColor.asARGB()) {
+                    setInternalColor(next, timedColor.duration());
+                    lastAppliedColor = next;
+                }
+            }
+        }
+
+        tick++;
+        if (ignoreColorChange > 0) ignoreColorChange--;
+    }
+
+    public void setIgnoreColorChange(int duration) {
+        this.ignoreColorChange = duration;
     }
 
     public void addItemDisplay(String key, HoloItemDisplay display){

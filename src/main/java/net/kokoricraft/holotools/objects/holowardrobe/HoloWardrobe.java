@@ -2,14 +2,12 @@ package net.kokoricraft.holotools.objects.holowardrobe;
 
 import net.kokoricraft.holotools.HoloTools;
 import net.kokoricraft.holotools.enums.HoloActionType;
-import net.kokoricraft.holotools.enums.HoloColors;
 import net.kokoricraft.holotools.enums.HoloType;
 import net.kokoricraft.holotools.interfaces.HoloBase;
 import net.kokoricraft.holotools.objects.colors.HoloPanelsColors;
 import net.kokoricraft.holotools.objects.halo.HaloSlot;
 import net.kokoricraft.holotools.objects.halo.Holo;
 import net.kokoricraft.holotools.objects.tooltip.TooltipDisplay;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -48,11 +46,15 @@ public class HoloWardrobe extends Holo implements HoloBase {
         HaloSlot to = slots.get(toSlot);
 
         if(from != null){
-            from.setColor(colors.getColor(fromSlot).unselected());
+            from.setIgnoreColorChange(5);
+            from.removeExtraY();
+            from.setColor(colors.getColor(fromSlot).unselected().clone());
         }
 
         if(to != null){
-            to.setColor(colors.getColor(toSlot).selected());
+            to.setIgnoreColorChange(5);
+            to.addExtraYSize(0.45f);
+            to.setColor(colors.getColor(toSlot).selected().clone());
         }
 
         if(plugin.getConfigManager().TOOLTIP_ENABLED)

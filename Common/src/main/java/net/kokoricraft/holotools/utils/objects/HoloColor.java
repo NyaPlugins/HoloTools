@@ -3,34 +3,26 @@ package net.kokoricraft.holotools.utils.objects;
 import com.google.common.base.Preconditions;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
-public final class HoloColor {
+public final class HoloColor implements Cloneable {
     private static final int BIT_MASK = 0xff;
     private static final int DEFAULT_ALPHA = 255;
-
-    public static final HoloColor WHITE = fromRGB(0xFFFFFF);
-    public static final HoloColor SILVER = fromRGB(0xC0C0C0);
-    public static final HoloColor GRAY = fromRGB(0x808080);
-    public static final HoloColor BLACK = fromRGB(0x000000);
-    public static final HoloColor RED = fromRGB(0xFF0000);
-    public static final HoloColor MAROON = fromRGB(0x800000);
-    public static final HoloColor YELLOW = fromRGB(0xFFFF00);
-    public static final HoloColor OLIVE = fromRGB(0x808000);
-    public static final HoloColor LIME = fromRGB(0x00FF00);
-    public static final HoloColor GREEN = fromRGB(0x008000);
-    public static final HoloColor AQUA = fromRGB(0x00FFFF);
-    public static final HoloColor TEAL = fromRGB(0x008080);
-    public static final HoloColor BLUE = fromRGB(0x0000FF);
-    public static final HoloColor NAVY = fromRGB(0x000080);
-    public static final HoloColor FUCHSIA = fromRGB(0xFF00FF);
-    public static final HoloColor PURPLE = fromRGB(0x800080);
-    public static final HoloColor ORANGE = fromRGB(0xFFA500);
 
     private final byte alpha;
     private final byte red;
     private final byte green;
     private final byte blue;
+
+    public record TimedColor(HoloColor color, int duration) {
+        public String toString() {
+            return "[%s:%s]".formatted(color, duration);
+        }
+    }
+
+    private List<TimedColor> sequence;
 
     public static HoloColor fromARGB(int alpha, int red, int green, int blue) throws IllegalArgumentException {
         return new HoloColor(alpha, red, green, blue);
@@ -53,25 +45,12 @@ public final class HoloColor {
         return fromARGB(argb >> 24 & BIT_MASK, argb >> 16 & BIT_MASK, argb >> 8 & BIT_MASK, argb & BIT_MASK);
     }
 
-    public static HoloColor fromBGR(int bgr) throws IllegalArgumentException {
-        Preconditions.checkArgument((bgr >> 24) == 0, "Extrenuous data in: %s", bgr);
-        return fromBGR(bgr >> 16 & BIT_MASK, bgr >> 8 & BIT_MASK, bgr & BIT_MASK);
-    }
-
-    public static HoloColor fromHex(String hexColor, int opacity){
-        if(hexColor == null || !hexColor.matches("#[0-9a-fA-F]{6}"))
+    public static HoloColor fromHex(String hexColor, int opacity) {
+        if (hexColor == null || !hexColor.matches("#[0-9a-fA-F]{6}"))
             throw new IllegalArgumentException("Invalid hex color format. Must be #RRGGBB.");
 
         Color color = Color.decode(hexColor);
-
-        int red = color.getRed();
-        int green = color.getGreen();
-        int blue = color.getBlue();
-
-        if(opacity < 0 || opacity > 255)
-            throw new IllegalArgumentException("Opacity must be between 0 and 255.");
-
-        return fromARGB(opacity, red, green, blue);
+        return fromARGB(opacity, color.getRed(), color.getGreen(), color.getBlue());
     }
 
     private HoloColor(int red, int green, int blue) {
@@ -88,6 +67,47 @@ public final class HoloColor {
         this.red = (byte) red;
         this.green = (byte) green;
         this.blue = (byte) blue;
+        this.sequence = new ArrayList<>();
+    }
+
+    public void addToSequence(HoloColor color, int duration) {
+        sequence.add(new TimedColor(color, duration));
+    }
+
+    public TimedColor getColor(int tick) {
+        if (sequence.isEmpty()) return null;
+
+        int totalDuration = sequence.stream().mapToInt(TimedColor::duration).sum();
+        int loopTick = tick % totalDuration;
+
+        int currentTick = 0;
+        for (TimedColor timedColor : sequence) {
+            currentTick += timedColor.duration();
+            if (loopTick < currentTick) {
+                return timedColor;
+            }
+        }
+
+        return sequence.get(sequence.size() - 1);
+    }
+
+    public List<TimedColor> getSequence() {
+        return sequence;
+    }
+
+    public void clearSequence() {
+        sequence.clear();
+    }
+
+    @Override
+    public HoloColor clone() {
+        try {
+            HoloColor clone = (HoloColor) super.clone();
+            clone.sequence = new ArrayList<>(this.sequence);
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 
     public int getAlpha() {
@@ -122,33 +142,8 @@ public final class HoloColor {
         return fromARGB(getAlpha(), getRed(), getGreen(), blue);
     }
 
-    public int asRGB() {
-        return getRed() << 16 | getGreen() << 8 | getBlue();
-    }
-
     public int asARGB() {
         return getAlpha() << 24 | getRed() << 16 | getGreen() << 8 | getBlue();
-    }
-
-    public int asBGR() {
-        return getBlue() << 16 | getGreen() << 8 | getRed();
-    }
-
-    public HoloColor mixDyes(HoloColor... colors) {
-        Preconditions.checkArgument(colors != null && colors.length > 0, "No colors specified");
-
-        int totalRed = getRed();
-        int totalGreen = getGreen();
-        int totalBlue = getBlue();
-
-        for (HoloColor color : colors) {
-            totalRed += color.getRed();
-            totalGreen += color.getGreen();
-            totalBlue += color.getBlue();
-        }
-
-        int count = colors.length + 1;
-        return fromRGB(totalRed / count, totalGreen / count, totalBlue / count);
     }
 
     @Override
@@ -156,10 +151,7 @@ public final class HoloColor {
         if (this == o) return true;
         if (!(o instanceof HoloColor)) return false;
         HoloColor color = (HoloColor) o;
-        return alpha == color.alpha &&
-                red == color.red &&
-                green == color.green &&
-                blue == color.blue;
+        return alpha == color.alpha && red == color.red && green == color.green && blue == color.blue;
     }
 
     @Override
