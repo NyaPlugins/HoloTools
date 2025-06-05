@@ -33,15 +33,16 @@ public class ConfigManager {
     public StorageMode STORAGE_MODE = StorageMode.ITEM;
     public StorageType STORAGE_TYPE = StorageType.YAML;
     public StorageConfig STORAGE_CONFIG;
+    public Map<HoloType, Integer> DEFAULT_SLOTS = new HashMap<>();
 
     public static final DualColor DUAL_COLOR_DEF = new DualColor(HoloColors.WHITE.getColor(), HoloColors.WHITE_SELECTED.getColor());
 
-    public ConfigManager(HoloTools plugin){
+    public ConfigManager(HoloTools plugin) {
         this.plugin = plugin;
         loadConfig();
     }
 
-    public void loadConfig(){
+    public void loadConfig() {
         // Config.yml configuration.
         NekoConfig config = new NekoConfig("config.yml", plugin);
 
@@ -51,7 +52,7 @@ public class ConfigManager {
         STORAGE_MODE = StorageMode.valueOf(config.getString("storage.mode", "item").toUpperCase());
         STORAGE_TYPE = StorageType.valueOf(config.getString("storage.type", "yaml").toUpperCase());
 
-        if(!config.contains("storage.config"))
+        if (!config.contains("storage.config"))
             generateDefaultStorageConfig(config);
 
         STORAGE_CONFIG = new StorageConfig(config.getConfigurationSection("storage.config"));
@@ -66,7 +67,9 @@ public class ConfigManager {
         CRAFTER_ITEM.setTag("holo", "yes");
         CRAFTER_ITEM.setTag("holo_crafter", new JsonObject().toString());
 
-        if(!crafter.contains("colors_lists"))
+        DEFAULT_SLOTS.put(HoloType.HOLOCRAFTER, crafter.getInt("default_slots", 8));
+
+        if (!crafter.contains("colors_lists"))
             generateDefaultConfig(crafter, HoloType.HOLOCRAFTER);
 
         CRAFTER_PANELS_COLORS = getPanelsColors(crafter);
@@ -80,9 +83,11 @@ public class ConfigManager {
         WARDROBE_ITEM.setTag("holo", "yes");
         WARDROBE_ITEM.setTag("holo_wardrobe", new JsonObject().toString());
 
+        DEFAULT_SLOTS.put(HoloType.HOLOWARDROBE, crafter.getInt("default_slots", 8));
+
         TOOLTIP_ENABLED = wardrobe.getBoolean("tooltip.enabled", true);
 
-        if(!wardrobe.contains("colors_lists"))
+        if (!wardrobe.contains("colors_lists"))
             generateDefaultConfig(wardrobe, HoloType.HOLOWARDROBE);
 
         WARDROBE_PANELS_COLORS = getPanelsColors(wardrobe);
@@ -90,16 +95,16 @@ public class ConfigManager {
         wardrobe.update();
     }
 
-    private void generateDefaultConfig(NekoConfig config, HoloType type){
+    private void generateDefaultConfig(NekoConfig config, HoloType type) {
         //generate colors default config
         String default_color_path = "colors.default.";
-        config.set(default_color_path+"need_permission", false);
-        config.set(default_color_path+"permission", "holotools."+type.name().toLowerCase()+".color.default");
-        config.set(default_color_path+"slots.default_slot", "blue");
+        config.set(default_color_path + "need_permission", false);
+        config.set(default_color_path + "permission", "holotools." + type.name().toLowerCase() + ".color.default");
+        config.set(default_color_path + "slots.default_slot", "blue");
 
-        for(int i = 0; i < 8; i++){
-            if(i != 0 && i != 2 && i != 4 && i != 6) continue;
-            config.set(default_color_path+"slots.slot_"+i, "light_blue");
+        for (int i = 0; i < 8; i++) {
+            if (i != 0 && i != 2 && i != 4 && i != 6) continue;
+            config.set(default_color_path + "slots.slot_" + i, "light_blue");
         }
 
         config.set("colors_lists.blue.unselected.hex", "#19a7d2");
@@ -115,32 +120,32 @@ public class ConfigManager {
         config.forceUpdate();
     }
 
-    private void generateDefaultStorageConfig(NekoConfig config){
+    private void generateDefaultStorageConfig(NekoConfig config) {
         String path = "storage.config.";
 
-        config.set(path+"host", "localhost");
-        config.set(path+"port", "3306");
-        config.set(path+"user", "user");
-        config.set(path+"password", "password");
-        config.set(path+"database", "database");
+        config.set(path + "host", "localhost");
+        config.set(path + "port", "3306");
+        config.set(path + "user", "user");
+        config.set(path + "password", "password");
+        config.set(path + "database", "database");
         config.forceUpdate();
     }
 
-    private List<HoloPanelsColors> getPanelsColors(NekoConfig config){
+    private List<HoloPanelsColors> getPanelsColors(NekoConfig config) {
         List<HoloPanelsColors> colors = new ArrayList<>();
 
         Map<String, DualColor> dualColorMap = getColors(config);
 
         ConfigurationSection section = config.getConfigurationSection("colors");
 
-        if(section != null){
-            for(String name : section.getKeys(false)){
+        if (section != null) {
+            for (String name : section.getKeys(false)) {
                 Map<String, DualColor> slots_colors = new HashMap<>();
                 boolean need_permission = section.getBoolean("need_permission", false);
                 String permission = section.getString("permission");
-                ConfigurationSection slotsSection = section.getConfigurationSection(name+".slots");
-                if(slotsSection != null){
-                    for(String slot : slotsSection.getKeys(false)){
+                ConfigurationSection slotsSection = section.getConfigurationSection(name + ".slots");
+                if (slotsSection != null) {
+                    for (String slot : slotsSection.getKeys(false)) {
                         slots_colors.put(slot, dualColorMap.getOrDefault(slotsSection.getString(slot), null));
                     }
                 }

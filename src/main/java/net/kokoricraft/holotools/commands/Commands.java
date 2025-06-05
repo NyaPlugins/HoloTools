@@ -27,36 +27,50 @@ import net.kokoricraft.holotools.version.HoloTextDisplay;
 public class Commands implements CommandExecutor {
     private final HoloTools plugin;
     private final boolean test = false;
+    public static float test1 = 0f;
+    public static float test2 = 21f;
 
-    public Commands(HoloTools plugin){
+    public Commands(HoloTools plugin) {
         this.plugin = plugin;
     }
+
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args){
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         //Player player = (Player) sender;
-        if(args.length == 0){
+        if (args.length == 0) {
             sender.sendMessage(plugin.getUtils().color(String.format("&cUse %s give / reload", label)));
             return true;
         }
 
-        switch (args[0].toLowerCase()){
+        switch (args[0].toLowerCase()) {
             case "give" -> giveCommand(sender, args);
             case "reload" -> reloadCommand(sender);
             case "debug" -> debugCommand(sender);
-            case "test" -> testCommand(sender, args);
+            case "test3" -> testCommand(sender, args);
             case "test2" -> test2(sender, args);
+            case "test" -> test(args);
         }
 
         return true;
     }
 
+    private void test(String[] args) {
+        if (!test) return;
+
+        test1 = Float.parseFloat(args[1]);
+        test2 = Float.parseFloat(args[2]);
+        Player player = Bukkit.getPlayerExact("FavioMC19");
+        plugin.getHoloManager().disable(player);
+        plugin.getHoloManager().enable(player);
+    }
+
     private void testCommand(CommandSender sender, String[] args) {
         if (!test) return;
-        if(!(sender instanceof Player)) {
+        if (!(sender instanceof Player)) {
             sender.sendMessage(plugin.getUtils().color("&cYou must be a player to do that"));
             return;
         }
-        Player player = (Player)sender;
+        Player player = (Player) sender;
 
         Location location = player.getLocation().clone();
 
@@ -95,7 +109,7 @@ public class Commands implements CommandExecutor {
 
         HoloItemDisplay d3 = plugin.getCompatManager().createItemDisplay(List.of(player), location, 0, 0);
         ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
-        SkullMeta skullMeta = (SkullMeta)itemStack.getItemMeta();
+        SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
         skullMeta.setOwningPlayer(player);
         itemStack.setItemMeta(skullMeta);
         d3.setItemStack(itemStack);
@@ -109,23 +123,23 @@ public class Commands implements CommandExecutor {
 
         sender.sendMessage("test");
 
-        Bukkit.getScheduler().runTaskLater(plugin, () ->{
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
             d1.remove();
             d2.remove();
             d3.remove();
         }, 20 * 15);
     }
 
-    public void test3(CommandSender sender, String[] args){
+    public void test3(CommandSender sender, String[] args) {
         if (!test) return;
-        if(!(sender instanceof Player player)) return;
+        if (!(sender instanceof Player player)) return;
         Location location = player.getLocation();
 
         List<HoloTextDisplay> displays = new ArrayList<>();
 
         float scale = 0.5f;
 
-        for(int i = 0; i < 30; i++){
+        for (int i = 0; i < 30; i++) {
             HoloTextDisplay main = plugin.getCompatManager().createTextDisplay(List.of(player), location, 0, 0);
             String separators = StringUtils.repeat("....", i);
             main.setBillboard(Display.Billboard.VERTICAL);
@@ -141,14 +155,14 @@ public class Commands implements CommandExecutor {
         }
 
 
-        Bukkit.getScheduler().runTaskLater(plugin, () ->{
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
             displays.forEach(HoloTextDisplay::remove);
         }, 20 * 8);
     }
 
-    public void test2(CommandSender sender, String[] args){
+    public void test2(CommandSender sender, String[] args) {
         if (!test) return;
-        if(!(sender instanceof Player player)) return;
+        if (!(sender instanceof Player player)) return;
         Location location = player.getLocation();
 
         ItemDisplay display = location.getWorld().spawn(location, ItemDisplay.class);
@@ -157,7 +171,7 @@ public class Commands implements CommandExecutor {
         display.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.GROUND);
         Transformation transformation = display.getTransformation();
 
-        Bukkit.getScheduler().runTaskLater(plugin, () ->{
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
             display.setInterpolationDelay(1);
             display.setInterpolationDuration(20 * 10);
             transformation.getLeftRotation().rotateXYZ((float) Math.toRadians(0), (float) Math.toRadians(90), (float) Math.toRadians(0));
@@ -165,22 +179,22 @@ public class Commands implements CommandExecutor {
         }, 10);
     }
 
-    public String getText(int i){
+    public String getText(int i) {
         List<String> list = new ArrayList<>();
         String points = Strings.repeat('.', i);
-        if(i == 0)
+        if (i == 0)
             points = "";
 
-        list.add(points+"&#2e2b00Esto solo es una &#2e2b00prueba&#2e2b00 para ver si"+points);
-        list.add(points+"&#2e2b00Sirve hacer un plugin de cinematicas"+points);
-        list.add(points+"&#2e2b00o abandonarlo y yas. de todas formas"+points);
-        list.add(points+"&#2e2b00no pasa nada por probar asi que &o:cat:"+points);
+        list.add(points + "&#2e2b00Esto solo es una &#2e2b00prueba&#2e2b00 para ver si" + points);
+        list.add(points + "&#2e2b00Sirve hacer un plugin de cinematicas" + points);
+        list.add(points + "&#2e2b00o abandonarlo y yas. de todas formas" + points);
+        list.add(points + "&#2e2b00no pasa nada por probar asi que &o:cat:" + points);
 
         return plugin.getUtils().color(String.join("\n", list));
     }
 
     private void debugCommand(CommandSender sender) {
-        if(!(sender.hasPermission("holotools.command.debug"))){
+        if (!(sender.hasPermission("holotools.command.debug"))) {
             sender.sendMessage(plugin.getUtils().color(plugin.getLangManager().NO_PERMISSION));
             return;
         }
@@ -189,13 +203,13 @@ public class Commands implements CommandExecutor {
         sender.sendMessage(plugin.getUtils().color(enabled ? "&aDebug mode enabled!" : "&cDebug mode disabled!"));
     }
 
-    private void giveCommand(CommandSender sender, String[] args){
-        if(!sender.hasPermission("holotools.command.give")){
+    private void giveCommand(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("holotools.command.give")) {
             sender.sendMessage(plugin.getUtils().color(plugin.getLangManager().NO_PERMISSION));
             return;
         }
 
-        if(args.length < 2 || !(sender instanceof Player) && args.length < 3){
+        if (args.length < 2 || !(sender instanceof Player) && args.length < 3) {
             sender.sendMessage(plugin.getUtils().color("&cIncorrect usage. Use: /holotools give <item> [player] [amount]"));
             return;
         }
@@ -203,45 +217,47 @@ public class Commands implements CommandExecutor {
         String itemName = args[1].toLowerCase();
         Player target = null;
         int amount = 0;
-        if(args.length == 2 && sender instanceof Player) {
+        if (args.length == 2 && sender instanceof Player) {
             target = (Player) sender;
             amount = 1;
         }
-        if(args.length == 3 && sender instanceof Player) {
+        if (args.length == 3 && sender instanceof Player) {
             target = (Player) sender;
             try {
                 amount = Integer.valueOf(args[2]);
-            } catch(NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 target = Bukkit.getPlayer(args[2]);
                 amount = 1;
             }
         }
-        if(args.length == 3 && !(sender instanceof Player)) {
+        if (args.length == 3 && !(sender instanceof Player)) {
             target = Bukkit.getPlayer(args[2]);
             amount = 1;
         }
-        if(args.length == 4) {
+        if (args.length == 4) {
             target = Bukkit.getPlayer(args[2]);
             try {
                 amount = Integer.valueOf(args[3]);
-            } catch(NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 sender.sendMessage(plugin.getUtils().color("&cIncorrect usage. Use: /holotools give <item> <player> <amount>"));
                 return;
             }
         }
-        if(target == null){
+        if (target == null) {
             sender.sendMessage(plugin.getUtils().color("&cPlayer not found."));
             return;
         }
-        if(amount <= 0){
+        if (amount <= 0) {
             sender.sendMessage(plugin.getUtils().color("&cAmount cannot be 0 or negative."));
             return;
         }
 
         ItemStack item;
-        switch(itemName){
-            case "holocrafter" -> item = plugin.getConfigManager().CRAFTER_ITEM.getItem("id", plugin.getDataManager().getStorage().getNextID());
-            case "holowardrobe" -> item = plugin.getConfigManager().WARDROBE_ITEM.getItem("id", plugin.getDataManager().getStorage().getNextID());
+        switch (itemName) {
+            case "holocrafter" ->
+                    item = plugin.getConfigManager().CRAFTER_ITEM.getItem("id", plugin.getDataManager().getStorage().getNextID());
+            case "holowardrobe" ->
+                    item = plugin.getConfigManager().WARDROBE_ITEM.getItem("id", plugin.getDataManager().getStorage().getNextID());
             default -> {
                 sender.sendMessage(plugin.getUtils().color("&cTool does not exist."));
                 return;
@@ -252,11 +268,12 @@ public class Commands implements CommandExecutor {
 
         target.getInventory().addItem(item);
         target.sendMessage(plugin.getUtils().color(String.format("&aYou have received %d %s(s).", amount, itemName)));
-        if(sender != target) sender.sendMessage(plugin.getUtils().color(String.format("&aYou have given %d %s(s) to %s.", amount, itemName, target.getName())));
+        if (sender != target)
+            sender.sendMessage(plugin.getUtils().color(String.format("&aYou have given %d %s(s) to %s.", amount, itemName, target.getName())));
     }
 
-    private void reloadCommand(CommandSender sender){
-        if(!sender.hasPermission("holotools.command.reload")){
+    private void reloadCommand(CommandSender sender) {
+        if (!sender.hasPermission("holotools.command.reload")) {
             sender.sendMessage(plugin.getUtils().color(plugin.getLangManager().NO_PERMISSION));
             return;
         }

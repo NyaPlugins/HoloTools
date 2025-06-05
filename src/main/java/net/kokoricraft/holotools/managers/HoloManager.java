@@ -25,58 +25,58 @@ public class HoloManager {
     public static NamespacedKey HOLO_KEY;
     private final Map<Player, BukkitTask> tasks = new HashMap<>();
 
-    public HoloManager(HoloTools plugin){
+    public HoloManager(HoloTools plugin) {
         this.plugin = plugin;
         HOLO_KEY = new NamespacedKey(plugin, "holo");
     }
 
     long time;
 
-    public void check(Player player){
+    public void check(Player player) {
         ItemStack itemStack = player.getInventory().getItemInMainHand();
         time = System.currentTimeMillis();
         boolean hasHolo = isHolo(itemStack);
         boolean preHolo = opened.containsKey(player);
 
-        if(hasHolo && preHolo){
+        if (hasHolo && preHolo) {
             Holo holo = opened.get(player);
             ItemStack old = holo.getItemStack();
-            if(!old.equals(itemStack)){
+            if (!old.equals(itemStack)) {
                 holo.remove("remove check player 0");
                 enable(player);
                 return;
             }
         }
 
-        if(!hasHolo && preHolo){
+        if (!hasHolo && preHolo) {
             disable(player);
             return;
         }
 
-        if(hasHolo && !preHolo){
+        if (hasHolo && !preHolo) {
             enable(player);
         }
 
     }
 
-    public void enable(Player player){
+    public void enable(Player player) {
         ItemStack itemStack = player.getInventory().getItemInMainHand();
         ItemMeta meta = itemStack.getItemMeta();
-        if(meta == null) return;
+        if (meta == null) return;
 
-        if(opened.containsKey(player)){
+        if (opened.containsKey(player)) {
             Holo holo = opened.get(player);
             holo.setVisible(false);
         }
 
-        if(meta.getPersistentDataContainer().has(plugin.getDataManager().CRAFTER_KEY, PersistentDataType.STRING)){
+        if (meta.getPersistentDataContainer().has(plugin.getDataManager().CRAFTER_KEY, PersistentDataType.STRING)) {
             HoloCrafter holoCrafter = plugin.getDataManager().loadHoloCrafter(player, itemStack);
             holoCrafter.setVisible(true);
             opened.put(player, holoCrafter);
             return;
         }
 
-        if(meta.getPersistentDataContainer().has(plugin.getDataManager().WARDROBE_KEY, PersistentDataType.STRING)){
+        if (meta.getPersistentDataContainer().has(plugin.getDataManager().WARDROBE_KEY, PersistentDataType.STRING)) {
             HoloWardrobe holoWardrobe = plugin.getDataManager().loadHoloWardrobe(player, itemStack);
             holoWardrobe.setVisible(true);
             opened.put(player, holoWardrobe);
@@ -84,36 +84,35 @@ public class HoloManager {
         }
     }
 
-    public void disable(Player player){
+    public void disable(Player player) {
         Holo holo = opened.get(player);
-        if(holo == null) return;
+        if (holo == null) return;
 
         holo.setVisible(false);
         opened.remove(player);
-
     }
 
-    public boolean isHolo(ItemStack itemStack){
-        if(itemStack == null) return false;
+    public boolean isHolo(ItemStack itemStack) {
+        if (itemStack == null) return false;
 
         ItemMeta meta = itemStack.getItemMeta();
-        if(meta == null) return false;
+        if (meta == null) return false;
 
         PersistentDataContainer dataContainer = meta.getPersistentDataContainer();
         return dataContainer.has(HOLO_KEY, PersistentDataType.STRING);
     }
 
-    public Holo getHolo(Player player){
+    public Holo getHolo(Player player) {
         return opened.get(player);
     }
 
-    public HoloPanelsColors getHoloColor(Player player, HoloType type){
-        List<HoloPanelsColors> colors =  type == HoloType.HOLOCRAFTER ? plugin.getConfigManager().CRAFTER_PANELS_COLORS :  plugin.getConfigManager().WARDROBE_PANELS_COLORS;
-       return colors.stream().filter(color -> color.canUse(player)).findFirst().orElse(null);
+    public HoloPanelsColors getHoloColor(Player player, HoloType type) {
+        List<HoloPanelsColors> colors = type == HoloType.HOLOCRAFTER ? plugin.getConfigManager().CRAFTER_PANELS_COLORS : plugin.getConfigManager().WARDROBE_PANELS_COLORS;
+        return colors.stream().filter(color -> color.canUse(player)).findFirst().orElse(null);
     }
 
-    public void update(Player player, long time){
-        if(tasks.containsKey(player)) return;
+    public void update(Player player, long time) {
+        if (tasks.containsKey(player)) return;
 
         BukkitTask task = Bukkit.getScheduler().runTaskLater(plugin, () -> {
             plugin.getHoloManager().check(player);

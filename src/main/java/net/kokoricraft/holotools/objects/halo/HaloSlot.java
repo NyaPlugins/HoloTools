@@ -44,12 +44,12 @@ public class HaloSlot {
         this.holo = holo;
     }
 
-    public void spawn(Player player){
+    public void spawn(Player player) {
         Location location = player.getLocation();
         World world = location.getWorld();
-        if(world == null) return;
+        if (world == null) return;
 
-        background = plugin.getCompatManager().createTextDisplay(plugin.getManager().getHoloPlayerView(player), location, 0, rotation + holo.getInitialYaw() - 90);
+        background = plugin.getCompatManager().createTextDisplay(plugin.getManager().getHoloPlayerView(player), location, 0, rotation + holo.getInitialYaw() - 90.0f);
         background.setTranslation((float) x, (float) y, (float) z);
         background.setScale(x_size, y_size, z_size);
         background.setText(" ");
@@ -59,28 +59,27 @@ public class HaloSlot {
         background.mount(player);
     }
 
-    public void remove(String reason){
-        if(background != null)
+    public void remove(String reason) {
+        if (background != null)
             background.remove();
 
         itemDisplayMap.values().forEach(HoloItemDisplay::remove);
         textDisplayMap.values().forEach(HoloTextDisplay::remove);
     }
 
-    public void setColor(HoloColor color){
+    public void setColor(HoloColor color) {
         this.color = color;
-        if(background == null){
+        if (background == null) {
             this.defColor = color;
             return;
         }
 
-        background.setColor(color);
-        background.interpolation(-1, 4);
-        background.update();
+        setInternalColor(color, 4);
     }
 
     private void setInternalColor(HoloColor color, int duration) {
         if (ignoreColorChange > 0) return;
+
         background.setColor(color);
         background.interpolation(-1, duration);
         background.update();
@@ -116,26 +115,27 @@ public class HaloSlot {
         this.ignoreColorChange = duration;
     }
 
-    public void addItemDisplay(String key, HoloItemDisplay display){
+    public void addItemDisplay(String key, HoloItemDisplay display) {
         itemDisplayMap.put(key, display);
     }
 
-    public void addTextDisplay(String key, HoloTextDisplay display){
+    public void addTextDisplay(String key, HoloTextDisplay display) {
         textDisplayMap.put(key, display);
     }
 
-    public HoloItemDisplay getItemDisplay(String key){
+    public HoloItemDisplay getItemDisplay(String key) {
         return itemDisplayMap.get(key);
     }
 
-    public HoloTextDisplay getTextDisplay(String key){
+    public HoloTextDisplay getTextDisplay(String key) {
         return textDisplayMap.get(key);
     }
 
-    public int getSlot(){
+    public int getSlot() {
         return slot;
     }
-    public float getInitialYaw(){
+
+    public float getInitialYaw() {
         return holo.getInitialYaw();
     }
 }

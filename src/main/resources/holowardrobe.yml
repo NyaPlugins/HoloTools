@@ -7,6 +7,8 @@ item:
   texture: "http://textures.minecraft.net/texture/e7c11f1f6b6dcebcd2d3e209d18f1136b1d2b6d654c49fa111f78c281eeb6484"
   custom_model_data: 0
 
+default_slots: 8
+
 tooltip:
   enabled: true
 

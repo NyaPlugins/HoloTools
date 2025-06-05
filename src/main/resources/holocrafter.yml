@@ -7,6 +7,8 @@ item:
   texture: "http://textures.minecraft.net/texture/58e992020c2506864e561c272220645ea9b32f09dffd8a29d7af2fa28932c96a"
   custom_model_data: 0
 
+default_slots: 8
+
 colors:
   default:
     need_permission: false
