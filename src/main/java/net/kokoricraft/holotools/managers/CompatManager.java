@@ -25,6 +25,7 @@ public class CompatManager {
             this.put("1.21.3", "v1_21_R2");
             this.put("1.21.4", "v1_21_R3");
             this.put("1.21.5", "v1_21_R4");
+            this.put("1.21.6", "v1_21_R5");
         }
     };
 

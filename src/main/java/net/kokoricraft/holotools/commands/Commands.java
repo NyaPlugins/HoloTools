@@ -3,6 +3,7 @@ package net.kokoricraft.holotools.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.kokoricraft.holotools.version.v1_21_R5;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -48,20 +49,21 @@ public class Commands implements CommandExecutor {
             case "debug" -> debugCommand(sender);
             case "test3" -> testCommand(sender, args);
             case "test2" -> test2(sender, args);
-            case "test" -> test(args);
+            case "test" -> test(sender, args);
         }
 
         return true;
     }
 
-    private void test(String[] args) {
+    private void test(CommandSender sender, String[] args) {
         if (!test) return;
 
-        test1 = Float.parseFloat(args[1]);
-        test2 = Float.parseFloat(args[2]);
-        Player player = Bukkit.getPlayerExact("FavioMC19");
-        plugin.getHoloManager().disable(player);
-        plugin.getHoloManager().enable(player);
+        if (sender instanceof Player player) {
+//            player.getInventory().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+            v1_21_R5 version = (v1_21_R5) plugin.getCompatManager().getCompat();
+            version.test();
+            sender.sendMessage(".");
+        }
     }
 
     private void testCommand(CommandSender sender, String[] args) {

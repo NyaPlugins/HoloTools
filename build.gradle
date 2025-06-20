@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'net.kokoricraft'
-version = '1.2.0'
+version = '1.2.1'
 
 repositories {
     mavenCentral()
@@ -32,6 +32,7 @@ dependencies {
     compileOnly(project(path: ":v1_20_R3"))
     compileOnly(project(path: ":v1_20_R4"))
     compileOnly(project(path: ":v1_21_R1"))
+    compileOnly(project(path: ":v1_21_R5"))
     implementation project(path: ':Common')
 }
 
@@ -68,7 +69,7 @@ jar {
     if (System.getProperty("user.name") == "nya") {
         destinationDirectory = file("${System.getProperty('user.home')}/Desktop")
     } else {
-        destinationDirectory = file("D:/servers/1.21.5/plugins")
+        destinationDirectory = file("D:/servers/1.21.6/plugins")
     }
     from {
         subprojects.collect { it.sourceSets.main.output }
