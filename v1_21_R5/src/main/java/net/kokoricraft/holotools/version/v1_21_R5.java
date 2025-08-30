@@ -4,19 +4,7 @@ import com.mojang.math.Transformation;
 import io.netty.channel.*;
 import net.kokoricraft.holotools.events.InventoryUpdateEvent;
 import net.kokoricraft.holotools.utils.objects.HoloColor;
-import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.dialog.Dialog;
-import net.md_5.bungee.api.dialog.DialogBase;
-import net.md_5.bungee.api.dialog.NoticeDialog;
-import net.md_5.bungee.api.dialog.action.ActionButton;
-import net.md_5.bungee.api.dialog.action.RunCommandAction;
-import net.md_5.bungee.api.dialog.body.PlainMessageBody;
-import net.md_5.bungee.api.dialog.chat.ShowDialogClickEvent;
-import net.md_5.bungee.api.dialog.input.BooleanInput;
-import net.md_5.bungee.api.dialog.input.TextInput;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.chat.ChatComponentUtils;
@@ -39,7 +27,6 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.World;
 import org.bukkit.Bukkit;
-import org.bukkit.Input;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_21_R5.CraftWorld;
 import org.bukkit.craftbukkit.v1_21_R5.entity.CraftEntity;
@@ -50,8 +37,6 @@ import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.NumberConversions;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -73,38 +58,7 @@ public class v1_21_R5 implements Compat{
     }
 
     public void test() {
-        Player player = Bukkit.getPlayerExact("FavioMC19");
-        if (player == null) return;
 
-        DialogBase base = new DialogBase(new TextComponent("Hello")).body(List.of(new PlainMessageBody(new TextComponent("Test"), 64))).canCloseWithEscape(true);
-
-        base.inputs(Arrays.asList(new TextInput("first", new TextComponent("Insert your name")),
-                new BooleanInput("pro", new TextComponent("Your are pro?"), false, "Yes", "No")));
-
-        Dialog notice = new NoticeDialog(base)
-                .action(new ActionButton(new TextComponent("test button"), new TextComponent("tooltip"), 128, new RunCommandAction("holotools $(first)")));
-
-        player.showDialog(notice);
-
-        player.spigot().sendMessage( new ComponentBuilder( "click me" ).event( new ShowDialogClickEvent( notice ) ).build() );
-
-        BukkitTask task = new BukkitRunnable() {
-            @Override
-            public void run() {
-                Input input = player.getCurrentInput();
-                if (input != null) {
-                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("%s, %s, %s, %s".formatted(input.isBackward(), input.isForward(), input.isJump(), input.isSneak(), input.isRight())));
-                }
-            }
-        }.runTaskTimer(Bukkit.getPluginManager().getPlugins()[0], 0, 1L);
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                player.clearDialog();
-                task.cancel();
-            }
-        }.runTaskLater(Bukkit.getPluginManager().getPlugins()[0], 20 * 30);
     }
 
     @Override
@@ -230,7 +184,7 @@ public class v1_21_R5 implements Compat{
 
     public void sendPacket(List<Player> players, Packet<?> packet){
         players.forEach(player -> {
-            ((CraftPlayer)player).getHandle().g.sendPacket(packet);
+            ((CraftPlayer)player).getHandle().g.b(packet);
         });
     }
 

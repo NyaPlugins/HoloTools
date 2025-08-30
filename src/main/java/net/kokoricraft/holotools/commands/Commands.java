@@ -3,7 +3,6 @@ package net.kokoricraft.holotools.commands;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.kokoricraft.holotools.version.v1_21_R5;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -27,7 +26,7 @@ import net.kokoricraft.holotools.version.HoloTextDisplay;
 
 public class Commands implements CommandExecutor {
     private final HoloTools plugin;
-    private final boolean test = false;
+    private final boolean test = true;
     public static float test1 = 0f;
     public static float test2 = 21f;
 
@@ -58,12 +57,12 @@ public class Commands implements CommandExecutor {
     private void test(CommandSender sender, String[] args) {
         if (!test) return;
 
-        if (sender instanceof Player player) {
-//            player.getInventory().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-            v1_21_R5 version = (v1_21_R5) plugin.getCompatManager().getCompat();
-            version.test();
-            sender.sendMessage(".");
-        }
+//        if (sender instanceof Player player) {
+////            player.getInventory().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+//            v1_21_R5 version = (v1_21_R5) plugin.getCompatManager().getCompat();
+//            version.test();
+//            sender.sendMessage(".");
+//        }
     }
 
     private void testCommand(CommandSender sender, String[] args) {

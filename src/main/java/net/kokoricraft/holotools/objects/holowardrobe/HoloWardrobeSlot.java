@@ -4,9 +4,12 @@ import net.kokoricraft.holotools.HoloTools;
 import net.kokoricraft.holotools.enums.HoloSize;
 import net.kokoricraft.holotools.objects.halo.HaloSlot;
 import net.kokoricraft.holotools.version.HoloItemDisplay;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.List;
@@ -108,16 +111,20 @@ public class HoloWardrobeSlot {
                 display.setViewRange(0);
             updateAll();
         } else {
-            head.setViewRange(content.getHelmet() == null ? 0 : 20);
+            head.setViewRange(isAir(content.getHelmet()) ? 0 : 20);
             head.setItemStack(content.getHelmet());
-            chest.setViewRange(content.getChestplate() == null ? 0 : 20);
+            chest.setViewRange(isAir(content.getChestplate()) ? 0 : 20);
             chest.setItemStack(content.getChestplate());
-            legs.setViewRange(content.getLeggings() == null ? 0 : 20);
+            legs.setViewRange(isAir(content.getLeggings()) ? 0 : 20);
             legs.setItemStack(content.getLeggings());
-            feet.setViewRange(content.getBoots() == null ? 0 : 20);
+            feet.setViewRange(isAir(content.getBoots()) ? 0 : 20);
             feet.setItemStack(content.getBoots());
             updateAll();
         }
+    }
+
+    private boolean isAir(ItemStack itemStack) {
+        return itemStack == null || itemStack.getType() == Material.AIR;
     }
 
     private void updateAll() {
