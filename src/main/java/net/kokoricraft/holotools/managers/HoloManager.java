@@ -56,7 +56,6 @@ public class HoloManager {
         if (hasHolo && !preHolo) {
             enable(player);
         }
-
     }
 
     public void enable(Player player) {
@@ -80,7 +79,6 @@ public class HoloManager {
             HoloWardrobe holoWardrobe = plugin.getDataManager().loadHoloWardrobe(player, itemStack);
             holoWardrobe.setVisible(true);
             opened.put(player, holoWardrobe);
-            return;
         }
     }
 

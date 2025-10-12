@@ -27,6 +27,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event){
+        plugin.getHoloManager().disable(event.getPlayer());
         plugin.getPlayerManager().remove(event.getPlayer().getUniqueId());
     }
 }
