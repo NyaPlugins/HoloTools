@@ -25,7 +25,7 @@ public class CommandsCompleter implements TabCompleter {
             case 2 : {
                 if(!sender.hasPermission("holotools.command.give")) break;
                 return "give".equalsIgnoreCase(args[0]) ?
-                        Arrays.asList("holocrafter", "holowardrobe").stream()
+                        Arrays.asList("holocrafter", "holowardrobe", "holobridge").stream()
                                 .filter(s -> s.startsWith(args[1].toLowerCase()))
                                 .collect(Collectors.toList()) : null;
             }
