@@ -22,6 +22,8 @@ public class LangManager {
     public String WARDROBE_CLICK_TO_SWAP;
     public String NO_PERMISSION;
     public String CONFIG_RELOADED;
+    public String BRIDGE_FAR_DISTANCE;
+    public String BRIDGE_STEEP_ANGLE;
 
     public LangManager(HoloTools plugin){
         this.plugin = plugin;
@@ -40,6 +42,9 @@ public class LangManager {
 
         WARDROBE_CLICK_TO_SAVE = getStringWithDefault(messages, "wardrobe.click_to_save");
         WARDROBE_CLICK_TO_SWAP = getStringWithDefault(messages, "wardrobe.click_to_swap");
+
+        BRIDGE_FAR_DISTANCE = getStringWithDefault(messages, "bridge.far_distance");
+        BRIDGE_STEEP_ANGLE = getStringWithDefault(messages, "bridge.step_angle");
 
         NO_PERMISSION = getStringWithDefault(messages, "others.no_permission");
         CONFIG_RELOADED = getStringWithDefault(messages, "others.config_reloaded");

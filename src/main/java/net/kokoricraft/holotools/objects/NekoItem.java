@@ -4,6 +4,7 @@ import net.kokoricraft.holotools.HoloTools;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -22,7 +23,9 @@ public class NekoItem {
     private Material material = Material.AMETHYST_SHARD;
     private ItemStack itemStack;
     private ItemStack head;
+    private boolean unbreakable = false;
     private final Map<String, String> tags = new HashMap<>();
+    private final Map<Enchantment, Integer> enchantments = new HashMap<>();
 
     public NekoItem(HoloTools plugin, ConfigurationSection config){
         this.plugin = plugin;
@@ -66,6 +69,14 @@ public class NekoItem {
         if(custom_model_data != null)
             meta.setCustomModelData(custom_model_data);
 
+        if (!enchantments.isEmpty()) {
+            enchantments.entrySet().forEach(entry -> meta.addEnchant(entry.getKey(), entry.getValue(), true));
+        }
+
+        if (unbreakable) {
+            meta.setUnbreakable(true);
+        }
+
         if(!tags.isEmpty()){
             PersistentDataContainer dataContainer = meta.getPersistentDataContainer();
             for(Map.Entry<String, String> entry : tags.entrySet()){
@@ -97,5 +108,17 @@ public class NekoItem {
         }
         item.setItemMeta(meta);
         return item;
+    }
+
+    public void setDefaultMaterial(Material material) {
+        this.material = material;
+    }
+
+    public void setUnbreakable(boolean unbreakable) {
+        this.unbreakable = unbreakable;
+    }
+
+    public void addEnchant(Enchantment enchantment, int level) {
+        enchantments.put(enchantment, level);
     }
 }

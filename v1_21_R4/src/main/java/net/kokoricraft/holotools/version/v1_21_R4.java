@@ -70,6 +70,16 @@ public class v1_21_R4 implements Compat{
     }
 
     @Override
+    public HoloBlockDisplay createBlockDisplay(List<Player> players, Location location, float yaw, float pitch) {
+        return null;
+    }
+
+    @Override
+    public HoloShulker createShulker(List<Player> players, Location location, float yaw, float pitch) {
+        return null;
+    }
+
+    @Override
     public void initPacketsRegister(Player player){
         try{
             ChannelPipeline pipeline = getPipeline((CraftPlayer) player);

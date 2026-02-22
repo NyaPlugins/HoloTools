@@ -10,6 +10,10 @@ wardrobe:
   click_to_save: "Click to save armor"
   click_to_swap: "Click to swap armor"
 
+bridge:
+  far_distance: "&cThe distance is too far"
+  step_angle: "&cThe angle is too steep."
+
 others:
   config_reloaded: "&aConfiguration reloaded successfully!"
   no_permission: "&cYou do not have permission to do this"

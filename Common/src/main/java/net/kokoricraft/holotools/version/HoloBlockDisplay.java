@@ -1,10 +1,14 @@
 package net.kokoricraft.holotools.version;
 
 import org.bukkit.Location;
-import org.bukkit.entity.*;
+import org.bukkit.Material;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
+import org.joml.Quaternionf;
 
-public interface HoloItemDisplay {
+public interface HoloBlockDisplay {
     void update(Location location);
     void remove();
     void setGlowing(boolean glowing);
@@ -16,9 +20,10 @@ public interface HoloItemDisplay {
     void mount(Entity target);
     void setItemStack(ItemStack itemStack);
     Location getLocation();
-    void setItemDisplayTransform(ItemDisplay.ItemDisplayTransform transform);
+    void setBlock(Material material);
     void setBillboard(Display.Billboard billboard);
     void setViewRange(float range);
     void setBrightness(Display.Brightness brightness);
     void interpolation(int delay, int duration);
+    void setLeftRotation(Quaternionf rotation);
 }

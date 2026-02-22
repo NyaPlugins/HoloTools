@@ -10,6 +10,10 @@ wardrobe:
   click_to_save: "Click para guardar la armadura"
   click_to_swap: "Click para cambiar la armadura"
 
+bridge:
+  far_distance: "&cLa distancia es demasiado larga"
+  step_angle: "&cLa inclinación es demasiado pronunciada"
+
 others:
   config_reloaded: "&aConfiguracion recargada con exito!"
   no_permission: "&cNo tienes permiso para hacer esto!"

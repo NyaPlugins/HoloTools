@@ -11,9 +11,12 @@ import net.kokoricraft.holotools.objects.colors.DualColor;
 import net.kokoricraft.holotools.objects.NekoConfig;
 import net.kokoricraft.holotools.objects.NekoItem;
 import net.kokoricraft.holotools.objects.colors.HoloPanelsColors;
+import net.kokoricraft.holotools.objects.holobridge.BridgeProfile;
 import net.kokoricraft.holotools.utils.objects.HoloColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.enchantments.Enchantment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +37,10 @@ public class ConfigManager {
     public StorageType STORAGE_TYPE = StorageType.YAML;
     public StorageConfig STORAGE_CONFIG;
     public Map<HoloType, Integer> DEFAULT_SLOTS = new HashMap<>();
+
+    public List<BridgeProfile> bridgeProfiles = new ArrayList<>();
+    public NekoItem BRIDGE_ITEM;
+    public int BRIDGE_DURATION = 30;
 
     public static final DualColor DUAL_COLOR_DEF = new DualColor(HoloColors.WHITE.getColor(), HoloColors.WHITE_SELECTED.getColor());
 
@@ -93,6 +100,34 @@ public class ConfigManager {
         WARDROBE_PANELS_COLORS = getPanelsColors(wardrobe);
 
         wardrobe.update();
+
+        //Bridge configuration.
+
+        NekoConfig bridge = new NekoConfig("holobridge.yml", plugin);
+
+        BRIDGE_ITEM = new NekoItem(plugin, bridge.getConfigurationSection("item"));
+        BRIDGE_ITEM.setTag("holobridge", "yes");
+        BRIDGE_ITEM.setDefaultMaterial(Material.TRIDENT);
+        BRIDGE_ITEM.addEnchant(Enchantment.LOYALTY, 3);
+        BRIDGE_ITEM.setUnbreakable(true);
+
+        BRIDGE_DURATION = bridge.getInt("default_duration", 30);
+        bridgeProfiles.clear();
+
+        ConfigurationSection bridgeSection = bridge.getConfigurationSection("profiles");
+        if (bridgeSection != null) {
+            for (String key : bridgeSection.getKeys(false)) {
+                int priority = config.getConfig().getInt("profiles." + key + ".priority", 0);
+                boolean needPermission = config.getConfig().getBoolean("profiles." + key + ".need_permission", false);
+                String permission = config.contains("profiles." + key + ".permission") ? config.getString("profiles." + key + ".permission") : "holotools.holobridge." + key;
+                int duration = config.contains("profiles." + key + ".duration") ? config.getInt("profiles." + key + ".duration", 0) : BRIDGE_DURATION;
+                Material material = Material.valueOf(config.getString("profiles." + key + ".material", "WHITE_STAINED_GLASS").toUpperCase());
+                BridgeProfile bridgeProfile = new BridgeProfile(BRIDGE_ITEM.getItem(), needPermission, permission, duration, priority, material);
+                bridgeProfiles.add(bridgeProfile);
+            }
+        }
+
+        bridge.update();
     }
 
     private void generateDefaultConfig(NekoConfig config, HoloType type) {

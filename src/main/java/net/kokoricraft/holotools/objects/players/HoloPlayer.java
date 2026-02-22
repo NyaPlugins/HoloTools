@@ -3,7 +3,7 @@ package net.kokoricraft.holotools.objects.players;
 import com.google.gson.JsonObject;
 import net.kokoricraft.holotools.HoloTools;
 import net.kokoricraft.holotools.enums.HoloType;
-import net.kokoricraft.holotools.objects.holowardrobe.HoloWardrobe;
+import net.kokoricraft.holotools.objects.holobridge.BridgeProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -52,5 +52,10 @@ public class HoloPlayer {
         }
 
         return maxSlots;
+    }
+
+    public BridgeProfile getBridgeProfile() {
+        Player player = Bukkit.getPlayer(uuid);
+        return plugin.getBridgeManager().getBridgeProfile(player);
     }
 }

@@ -5,12 +5,10 @@ import net.kokoricraft.holotools.commands.CommandsCompleter;
 import net.kokoricraft.holotools.data.PlayerManager;
 import net.kokoricraft.holotools.enums.GlowColor;
 import net.kokoricraft.holotools.interfaces.Tickable;
-import net.kokoricraft.holotools.listeners.HoloCrafterListener;
-import net.kokoricraft.holotools.listeners.HoloListener;
-import net.kokoricraft.holotools.listeners.PlayerListener;
-import net.kokoricraft.holotools.listeners.TestListeners;
+import net.kokoricraft.holotools.listeners.*;
 import net.kokoricraft.holotools.managers.*;
 import net.kokoricraft.holotools.objects.halo.Holo;
+import net.kokoricraft.holotools.objects.holobridge.Bridge;
 import net.kokoricraft.holotools.utils.CraftItemsUtils;
 import net.kokoricraft.holotools.utils.Metrics;
 import net.kokoricraft.holotools.utils.UpdateChecker;
@@ -31,6 +29,7 @@ public final class HoloTools extends JavaPlugin {
     private PlayerManager playerManager;
     private ConfigManager configManager;
     private LangManager langManager;
+    private BridgesManager bridgeManager;
     private UpdateChecker updateChecker;
     public boolean UPDATED = true;
     public String VERSION;
@@ -86,6 +85,7 @@ public final class HoloTools extends JavaPlugin {
         dataManager = new DataManager(this);
         playerManager = new PlayerManager(this);
         langManager = new LangManager(this);
+        bridgeManager = new BridgesManager(this);
 
         new Metrics(this, 23286);
     }
@@ -95,6 +95,7 @@ public final class HoloTools extends JavaPlugin {
         pm.registerEvents(new HoloListener(this), this);
         pm.registerEvents(new HoloCrafterListener(this), this);
         pm.registerEvents(new PlayerListener(this), this);
+        pm.registerEvents(new HoloBridgeListener(), this);
 //        pm.registerEvents(new TestListeners(this), this);
     }
 
@@ -138,6 +139,9 @@ public final class HoloTools extends JavaPlugin {
     }
     public PlayerManager getPlayerManager(){
         return playerManager;
+    }
+    public BridgesManager getBridgeManager() {
+        return bridgeManager;
     }
 
     public UpdateChecker getUpdateChecker(){

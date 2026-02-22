@@ -1,0 +1,16 @@
+item:
+  name: "&bHoloBridge"
+  lore:
+    - ""
+    - "&eCreate temporary bridges!"
+  custom_model_data: 0
+
+default_duration: 30
+
+profiles:
+  default:
+    priority: 0
+    need_permission: false
+    permission: "holotools.holobridge.default"
+    duration: 30
+    material: WHITE_STAINED_GLASS
