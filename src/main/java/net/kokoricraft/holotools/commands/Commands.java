@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -23,6 +24,8 @@ import net.kokoricraft.holotools.HoloTools;
 import net.kokoricraft.holotools.utils.objects.HoloColor;
 import net.kokoricraft.holotools.version.HoloItemDisplay;
 import net.kokoricraft.holotools.version.HoloTextDisplay;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 public class Commands implements CommandExecutor {
     private final HoloTools plugin;
@@ -47,6 +50,7 @@ public class Commands implements CommandExecutor {
             case "reload" -> reloadCommand(sender);
             case "debug" -> debugCommand(sender);
             case "test3" -> testCommand(sender, args);
+            case "test4" -> test4Command(sender, args);
             case "test2" -> test2(sender, args);
             case "test" -> test(sender, args);
         }
@@ -159,6 +163,42 @@ public class Commands implements CommandExecutor {
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             displays.forEach(HoloTextDisplay::remove);
         }, 20 * 8);
+    }
+
+    public void test4Command(CommandSender sender, String[] args) {
+        if (!test) return;
+        if (!(sender instanceof Player player)) return;
+        Location location = player.getLocation();
+        location.setPitch(0);
+        location.setYaw(0);
+
+        TextDisplay display = location.getWorld().spawn(location, TextDisplay.class);
+        display.setBackgroundColor(Color.fromARGB(0xffebff57));
+
+        Transformation t = display.getTransformation();
+
+// ángulo del rombo
+        float angle = (float) Math.toRadians(45);
+
+// rotación base
+        Quaternionf left = new Quaternionf().rotateZ(angle);
+
+// inversa EXACTA
+        Quaternionf right = new Quaternionf().rotateZ(-angle);
+
+// escala (define qué tan “afilado” es el rombo)
+        Vector3f scale = new Vector3f(2.0f, 1.0f, 1.0f);
+
+// aplicar
+        t.getLeftRotation().set(left);
+        t.getRightRotation().set(right);
+        t.getScale().set(scale);
+
+        display.setTransformation(t);
+
+        display.setText(" ");
+
+        Bukkit.getScheduler().runTaskLater(plugin, display::remove, 20 * 5);
     }
 
     public void test2(CommandSender sender, String[] args) {
