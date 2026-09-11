@@ -200,7 +200,7 @@ public class v1_19_R3 implements Compat{
         sendPacket(players, packet);
     }
 
-    public static class HoloDisplayText implements HoloTextDisplay{
+    public static class HoloDisplayText implements HoloTextDisplay {
         private final List<Player> players;
         private final Display.TextDisplay textDisplay;
         private Location location;

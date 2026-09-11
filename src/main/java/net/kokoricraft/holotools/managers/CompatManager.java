@@ -32,6 +32,9 @@ public class CompatManager {
             this.put("1.21.10", "v1_21_R6");
             this.put("1.21.11", "v1_21_R7");
             this.put("26.1", "v26_1");
+            this.put("26.1.1", "v26_1");
+            this.put("26.1.2", "v26_1");
+            this.put("26.2", "v26_2");
         }
     };
 
@@ -43,11 +46,15 @@ public class CompatManager {
 
     private void setVersionCompat() {
         String packageName = Bukkit.getServer().getClass().getPackage().getName();
-        if(packageName.contains("v")){
+        if (packageName.contains("v")) {
             VERSION = packageName.substring(packageName.lastIndexOf('.') + 1);
-        }else {
+        } else {
             String bukkitVersion = Bukkit.getBukkitVersion().split("-")[0];
-            this.VERSION = versions.getOrDefault(bukkitVersion, "-[NYA]-");
+            int buildIndex = bukkitVersion.indexOf(".build.");
+            if (buildIndex != -1) {
+                bukkitVersion = bukkitVersion.substring(0, buildIndex);
+            }
+            VERSION = versions.getOrDefault(bukkitVersion, "[Version not found. %s]".formatted(bukkitVersion));
         }
     }
 
