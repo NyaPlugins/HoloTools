@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import net.kokoricraft.holotools.HoloTools;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -13,6 +14,10 @@ public class WardrobeContent {
     private ItemStack chestplate;
     private ItemStack leggings;
     private ItemStack boots;
+    private ItemStack displayHelmet;
+    private ItemStack displayChestplate;
+    private ItemStack displayLeggings;
+    private ItemStack displayBoots;
 
     public WardrobeContent(){}
 
@@ -55,6 +60,67 @@ public class WardrobeContent {
         return boots;
     }
 
+    public void setDisplayHelmet(ItemStack displayHelmet) {
+        this.displayHelmet = displayHelmet;
+    }
+
+    public void setDisplayChestplate(ItemStack displayChestplate) {
+        this.displayChestplate = displayChestplate;
+    }
+
+    public void setDisplayLeggings(ItemStack displayLeggings) {
+        this.displayLeggings = displayLeggings;
+    }
+
+    public void setDisplayBoots(ItemStack displayBoots) {
+        this.displayBoots = displayBoots;
+    }
+
+    public ItemStack getDisplayHelmet() {
+        return (displayHelmet != null && displayHelmet.getType() != Material.AIR) ? displayHelmet : helmet;
+    }
+
+    public ItemStack getDisplayChestplate() {
+        return (displayChestplate != null && displayChestplate.getType() != Material.AIR) ? displayChestplate : chestplate;
+    }
+
+    public ItemStack getDisplayLeggings() {
+        return (displayLeggings != null && displayLeggings.getType() != Material.AIR) ? displayLeggings : leggings;
+    }
+
+    public ItemStack getDisplayBoots() {
+        return (displayBoots != null && displayBoots.getType() != Material.AIR) ? displayBoots : boots;
+    }
+
+    public ItemStack getDisplayItem(EquipmentSlot slot) {
+        return switch (slot) {
+            case HEAD -> getDisplayHelmet();
+            case CHEST -> getDisplayChestplate();
+            case LEGS -> getDisplayLeggings();
+            case FEET -> getDisplayBoots();
+            default -> null;
+        };
+    }
+
+    public void setDisplayItem(EquipmentSlot slot, ItemStack item) {
+        switch (slot) {
+            case HEAD -> setDisplayHelmet(item);
+            case CHEST -> setDisplayChestplate(item);
+            case LEGS -> setDisplayLeggings(item);
+            case FEET -> setDisplayBoots(item);
+        }
+    }
+
+    public ItemStack getItem(EquipmentSlot slot) {
+        return switch (slot) {
+            case HEAD -> helmet;
+            case CHEST -> chestplate;
+            case LEGS -> leggings;
+            case FEET -> boots;
+            default -> null;
+        };
+    }
+
     public JsonObject getToJson(){
         JsonObject jsonObject = new JsonObject();
         if(helmet != null && helmet.getType() != Material.AIR)
@@ -68,6 +134,18 @@ public class WardrobeContent {
 
         if(boots != null && boots.getType() != Material.AIR)
             jsonObject.addProperty("boots", plugin.getUtils().serializeItemStack(boots));
+
+        if(displayHelmet != null && displayHelmet.getType() != Material.AIR && !displayHelmet.equals(helmet))
+            jsonObject.addProperty("display_helmet", plugin.getUtils().serializeItemStack(displayHelmet));
+
+        if(displayChestplate != null && displayChestplate.getType() != Material.AIR && !displayChestplate.equals(chestplate))
+            jsonObject.addProperty("display_chestplate", plugin.getUtils().serializeItemStack(displayChestplate));
+
+        if(displayLeggings != null && displayLeggings.getType() != Material.AIR && !displayLeggings.equals(leggings))
+            jsonObject.addProperty("display_leggings", plugin.getUtils().serializeItemStack(displayLeggings));
+
+        if(displayBoots != null && displayBoots.getType() != Material.AIR && !displayBoots.equals(boots))
+            jsonObject.addProperty("display_boots", plugin.getUtils().serializeItemStack(displayBoots));
 
         return jsonObject;
     }
@@ -104,6 +182,18 @@ public class WardrobeContent {
             ItemStack loadedBoots = plugin.getUtils().deserializeItemStack(jsonObject.get("boots").getAsString());
             wardrobeContent.setBoots(loadedBoots);
         }
+
+        if(jsonObject.has("display_helmet"))
+            wardrobeContent.setDisplayHelmet(plugin.getUtils().deserializeItemStack(jsonObject.get("display_helmet").getAsString()));
+
+        if(jsonObject.has("display_chestplate"))
+            wardrobeContent.setDisplayChestplate(plugin.getUtils().deserializeItemStack(jsonObject.get("display_chestplate").getAsString()));
+
+        if(jsonObject.has("display_leggings"))
+            wardrobeContent.setDisplayLeggings(plugin.getUtils().deserializeItemStack(jsonObject.get("display_leggings").getAsString()));
+
+        if(jsonObject.has("display_boots"))
+            wardrobeContent.setDisplayBoots(plugin.getUtils().deserializeItemStack(jsonObject.get("display_boots").getAsString()));
 
         return wardrobeContent;
     }

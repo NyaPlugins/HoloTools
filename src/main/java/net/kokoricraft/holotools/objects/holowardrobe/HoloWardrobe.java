@@ -3,6 +3,7 @@ package net.kokoricraft.holotools.objects.holowardrobe;
 import net.kokoricraft.holotools.HoloTools;
 import net.kokoricraft.holotools.enums.HoloActionType;
 import net.kokoricraft.holotools.enums.HoloType;
+import net.kokoricraft.holotools.events.HoloWardrobeSaveItemEvent;
 import net.kokoricraft.holotools.interfaces.HoloBase;
 import net.kokoricraft.holotools.objects.colors.HoloPanelsColors;
 import net.kokoricraft.holotools.objects.halo.HaloSlot;
@@ -10,7 +11,10 @@ import net.kokoricraft.holotools.objects.halo.Holo;
 import net.kokoricraft.holotools.objects.tooltip.TooltipDisplay;
 import net.kokoricraft.holotools.objects.tooltip.TooltipPosition;
 import net.kokoricraft.holotools.utils.objects.HoloColor;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
@@ -71,6 +75,11 @@ public class HoloWardrobe extends Holo implements HoloBase {
         HoloWardrobeSlot wardrobeSlot = wardrobeSlots.get(slot);
 
         WardrobeContent saveArmor = WardrobeContent.fromPlayer(player);
+        WardrobeContent loadArmor = wardrobeSlot.getContent();
+
+        if (!saveArmor.isEmpty()) {
+            if (!handleSaveItemEvents(saveArmor, loadArmor, slot)) return;
+        }
 
         if (wardrobeSlot.getContent() == null && !saveArmor.isEmpty()) {
             player.getInventory().setHelmet(null);
@@ -81,7 +90,6 @@ public class HoloWardrobe extends Holo implements HoloBase {
             wardrobeSlot.setContent(saveArmor);
             plugin.getDataManager().saveHoloWardrobe(itemStack, this, "save wardrobe armor");
         } else {
-            WardrobeContent loadArmor = wardrobeSlot.getContent();
             if ((loadArmor == null || loadArmor.isEmpty()) && saveArmor.isEmpty()) return;
             wardrobeSlot.setContent(saveArmor);
             if (loadArmor != null)
@@ -91,6 +99,50 @@ public class HoloWardrobe extends Holo implements HoloBase {
 
         if (plugin.getConfigManager().TOOLTIP_ENABLED)
             onVerticalSlot(0, getVerticalSlot());
+    }
+
+    private boolean handleSaveItemEvents(WardrobeContent saveArmor, WardrobeContent loadArmor, int slot) {
+        ItemStack realHead = saveArmor.getHelmet();
+        if (realHead != null && realHead.getType() != Material.AIR) {
+            ItemStack oldHead = loadArmor != null && loadArmor.getHelmet() != null && loadArmor.getHelmet().getType() != Material.AIR ? loadArmor.getHelmet() : null;
+            ItemStack oldDisplayHead = loadArmor != null ? loadArmor.getDisplayHelmet() : null;
+            HoloWardrobeSaveItemEvent event = new HoloWardrobeSaveItemEvent(player, this, slot, EquipmentSlot.HEAD, realHead, oldHead, oldDisplayHead);
+            Bukkit.getPluginManager().callEvent(event);
+            if (event.isCancelled()) return false;
+            saveArmor.setDisplayHelmet(event.getDisplayItem());
+        }
+
+        ItemStack realChest = saveArmor.getChestplate();
+        if (realChest != null && realChest.getType() != Material.AIR) {
+            ItemStack oldChest = loadArmor != null && loadArmor.getChestplate() != null && loadArmor.getChestplate().getType() != Material.AIR ? loadArmor.getChestplate() : null;
+            ItemStack oldDisplayChest = loadArmor != null ? loadArmor.getDisplayChestplate() : null;
+            HoloWardrobeSaveItemEvent event = new HoloWardrobeSaveItemEvent(player, this, slot, EquipmentSlot.CHEST, realChest, oldChest, oldDisplayChest);
+            Bukkit.getPluginManager().callEvent(event);
+            if (event.isCancelled()) return false;
+            saveArmor.setDisplayChestplate(event.getDisplayItem());
+        }
+
+        ItemStack realLegs = saveArmor.getLeggings();
+        if (realLegs != null && realLegs.getType() != Material.AIR) {
+            ItemStack oldLegs = loadArmor != null && loadArmor.getLeggings() != null && loadArmor.getLeggings().getType() != Material.AIR ? loadArmor.getLeggings() : null;
+            ItemStack oldDisplayLegs = loadArmor != null ? loadArmor.getDisplayLeggings() : null;
+            HoloWardrobeSaveItemEvent event = new HoloWardrobeSaveItemEvent(player, this, slot, EquipmentSlot.LEGS, realLegs, oldLegs, oldDisplayLegs);
+            Bukkit.getPluginManager().callEvent(event);
+            if (event.isCancelled()) return false;
+            saveArmor.setDisplayLeggings(event.getDisplayItem());
+        }
+
+        ItemStack realBoots = saveArmor.getBoots();
+        if (realBoots != null && realBoots.getType() != Material.AIR) {
+            ItemStack oldBoots = loadArmor != null && loadArmor.getBoots() != null && loadArmor.getBoots().getType() != Material.AIR ? loadArmor.getBoots() : null;
+            ItemStack oldDisplayBoots = loadArmor != null ? loadArmor.getDisplayBoots() : null;
+            HoloWardrobeSaveItemEvent event = new HoloWardrobeSaveItemEvent(player, this, slot, EquipmentSlot.FEET, realBoots, oldBoots, oldDisplayBoots);
+            Bukkit.getPluginManager().callEvent(event);
+            if (event.isCancelled()) return false;
+            saveArmor.setDisplayBoots(event.getDisplayItem());
+        }
+
+        return true;
     }
 
     @Override
@@ -149,8 +201,8 @@ public class HoloWardrobe extends Holo implements HoloBase {
 
         switch (toSlot) {
             case 0 -> {
-                ItemStack stack = content == null ? null : wardrobeSlots.get(getPlayerSlot()).getContent().getHelmet();
-                if (stack != null) {
+                ItemStack stack = content == null ? null : wardrobeSlots.get(getPlayerSlot()).getContent().getDisplayHelmet();
+                if (stack != null && stack.getType() != Material.AIR) {
                     tooltip.setY(y + (separation * 1));
                     tooltip.setItemStack(stack);
                 } else {
@@ -158,8 +210,8 @@ public class HoloWardrobe extends Holo implements HoloBase {
                 }
             }
             case 1 -> {
-                ItemStack stack = content == null ? null : wardrobeSlots.get(getPlayerSlot()).getContent().getChestplate();
-                if (stack != null) {
+                ItemStack stack = content == null ? null : wardrobeSlots.get(getPlayerSlot()).getContent().getDisplayChestplate();
+                if (stack != null && stack.getType() != Material.AIR) {
                     tooltip.setY(y + (separation * 2));
                     tooltip.setItemStack(stack);
                 } else {
@@ -167,8 +219,8 @@ public class HoloWardrobe extends Holo implements HoloBase {
                 }
             }
             case 2 -> {
-                ItemStack stack = content == null ? null : wardrobeSlots.get(getPlayerSlot()).getContent().getLeggings();
-                if (stack != null) {
+                ItemStack stack = content == null ? null : wardrobeSlots.get(getPlayerSlot()).getContent().getDisplayLeggings();
+                if (stack != null && stack.getType() != Material.AIR) {
                     tooltip.setY(y + (separation * 3));
                     tooltip.setItemStack(stack);
                 } else {
@@ -176,8 +228,8 @@ public class HoloWardrobe extends Holo implements HoloBase {
                 }
             }
             case 3 -> {
-                ItemStack stack = content == null ? null : wardrobeSlots.get(getPlayerSlot()).getContent().getBoots();
-                if (stack != null) {
+                ItemStack stack = content == null ? null : wardrobeSlots.get(getPlayerSlot()).getContent().getDisplayBoots();
+                if (stack != null && stack.getType() != Material.AIR) {
                     tooltip.setY(y + (separation * 4));
                     tooltip.setItemStack(stack);
                 } else {

@@ -84,7 +84,7 @@ public class TooltipDisplay {
     }
 
     public void setItemStack(ItemStack itemStack) {
-        if(this.itemStack.equals(itemStack)){
+        if(this.itemStack != null && this.itemStack.equals(itemStack)){
             setVisible(true);
             return;
         }

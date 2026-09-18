@@ -44,22 +44,21 @@ public class HoloWardrobeSlot {
         head.setScale(0.5f, 0.5f, 0.5f);
         head.setBrightness(new Display.Brightness(15, 15));
 
-        if (content != null && content.getHelmet() != null)
-            head.setItemStack(content.getHelmet());
+        if (content != null && content.getDisplayHelmet() != null)
+            head.setItemStack(content.getDisplayHelmet());
 
         head.update();
         head.mount(player);
         entities.put(EquipmentSlot.HEAD, head);
         slot.addItemDisplay("wardrobe_content_head", head);
 
-
         HoloItemDisplay chestplate = plugin.getCompatManager().createItemDisplay(players, player.getLocation(), getYaw(), 0);
         chestplate.setTranslation(0, separation * 3 - y_translation, z);
         chestplate.setScale(0.5f, 0.5f, 0.5f);
         chestplate.setBrightness(new Display.Brightness(15, 15));
 
-        if (content != null && content.getChestplate() != null)
-            chestplate.setItemStack(content.getChestplate());
+        if (content != null && content.getDisplayChestplate() != null)
+            chestplate.setItemStack(content.getDisplayChestplate());
 
         chestplate.update();
         chestplate.mount(player);
@@ -71,8 +70,8 @@ public class HoloWardrobeSlot {
         leggings.setScale(0.5f, 0.5f, 0.5f);
         leggings.setBrightness(new Display.Brightness(15, 15));
 
-        if (content != null && content.getLeggings() != null)
-            leggings.setItemStack(content.getLeggings());
+        if (content != null && content.getDisplayLeggings() != null)
+            leggings.setItemStack(content.getDisplayLeggings());
 
         leggings.update();
         leggings.mount(player);
@@ -84,8 +83,8 @@ public class HoloWardrobeSlot {
         boots.setScale(0.5f, 0.5f, 0.5f);
         boots.setBrightness(new Display.Brightness(15, 15));
 
-        if (content != null && content.getBoots() != null)
-            boots.setItemStack(content.getBoots());
+        if (content != null && content.getDisplayBoots() != null)
+            boots.setItemStack(content.getDisplayBoots());
 
         boots.update();
         boots.mount(player);
@@ -111,15 +110,30 @@ public class HoloWardrobeSlot {
                 display.setViewRange(0);
             updateAll();
         } else {
-            head.setViewRange(isAir(content.getHelmet()) ? 0 : 20);
-            head.setItemStack(content.getHelmet());
-            chest.setViewRange(isAir(content.getChestplate()) ? 0 : 20);
-            chest.setItemStack(content.getChestplate());
-            legs.setViewRange(isAir(content.getLeggings()) ? 0 : 20);
-            legs.setItemStack(content.getLeggings());
-            feet.setViewRange(isAir(content.getBoots()) ? 0 : 20);
-            feet.setItemStack(content.getBoots());
+            head.setViewRange(isAir(content.getDisplayHelmet()) ? 0 : 20);
+            head.setItemStack(content.getDisplayHelmet());
+            chest.setViewRange(isAir(content.getDisplayChestplate()) ? 0 : 20);
+            chest.setItemStack(content.getDisplayChestplate());
+            legs.setViewRange(isAir(content.getDisplayLeggings()) ? 0 : 20);
+            legs.setItemStack(content.getDisplayLeggings());
+            feet.setViewRange(isAir(content.getDisplayBoots()) ? 0 : 20);
+            feet.setItemStack(content.getDisplayBoots());
             updateAll();
+        }
+    }
+
+    public ItemStack getDisplayItem(EquipmentSlot slot) {
+        return content != null ? content.getDisplayItem(slot) : null;
+    }
+
+    public void setDisplayItem(EquipmentSlot slot, ItemStack item) {
+        if (content == null) return;
+        content.setDisplayItem(slot, item);
+        HoloItemDisplay display = entities.get(slot);
+        if (display != null) {
+            display.setViewRange(isAir(item) ? 0 : 20);
+            display.setItemStack(item);
+            display.update();
         }
     }
 
@@ -136,8 +150,6 @@ public class HoloWardrobeSlot {
     }
 
     private float getYaw() {
-//        return (45 * slot.getSlot() + slot.getInitialYaw());
         return 360.0f / size * slot.getSlot() + (slot.getInitialYaw());
     }
-
 }
