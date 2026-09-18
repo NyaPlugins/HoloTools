@@ -13,6 +13,8 @@ import net.kokoricraft.holotools.objects.holocrafter.HoloCrafter;
 import net.kokoricraft.holotools.objects.holocrafter.HoloCrafterSlot;
 import net.kokoricraft.holotools.objects.holowardrobe.HoloWardrobe;
 import net.kokoricraft.holotools.objects.holowardrobe.HoloWardrobeSlot;
+import net.kokoricraft.holotools.objects.holowaypoint.HoloWaypoint;
+import net.kokoricraft.holotools.objects.holowaypoint.WaypointData;
 import net.kokoricraft.holotools.objects.players.HoloPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Keyed;
@@ -32,12 +34,16 @@ public class DataManager {
     private final HoloTools plugin;
     public final NamespacedKey CRAFTER_KEY;
     public final NamespacedKey WARDROBE_KEY;
+    public final NamespacedKey WAYPOINT_KEY;
+    public final NamespacedKey RADAR_KEY;
     private final Storage storage;
 
     public DataManager(HoloTools plugin) {
         this.plugin = plugin;
         CRAFTER_KEY = new NamespacedKey(plugin, "holo_crafter");
         WARDROBE_KEY = new NamespacedKey(plugin, "holo_wardrobe");
+        WAYPOINT_KEY = new NamespacedKey(plugin, "holo_waypoint");
+        RADAR_KEY = new NamespacedKey(plugin, "holo_radar");
 
         storage = switch (plugin.getConfigManager().STORAGE_TYPE) {
             case YAML -> new YamlStorage();
@@ -280,6 +286,101 @@ public class DataManager {
         itemStack.setItemMeta(meta);
 
         return new HoloWardrobe(player, itemStack, contentMap, slots);
+    }
+
+    public void saveHoloWaypoint(ItemStack itemStack, HoloWaypoint holoWaypoint, String reason) {
+        Player player = holoWaypoint.getPlayer();
+        Map<Integer, WaypointData> waypoints = holoWaypoint.getWaypoints();
+
+        JsonObject jsonObject = new JsonObject();
+
+        ItemMeta meta = itemStack.getItemMeta();
+        if (meta == null) return;
+
+        int id;
+        PersistentDataContainer dataContainer = meta.getPersistentDataContainer();
+        NamespacedKey idKey = new NamespacedKey(plugin, "id");
+
+        if (!dataContainer.has(idKey, PersistentDataType.INTEGER)) {
+            id = storage.getNextID();
+        } else {
+            Integer storedID = dataContainer.get(idKey, PersistentDataType.INTEGER);
+            id = Objects.requireNonNullElseGet(storedID, storage::getNextID);
+        }
+
+        meta.getPersistentDataContainer().set(idKey, PersistentDataType.INTEGER, id);
+
+        for (int slot : waypoints.keySet()) {
+            WaypointData wp = waypoints.get(slot);
+            if (wp == null) continue;
+            jsonObject.add("slot_" + slot, wp.toJsonObject());
+        }
+
+        if (plugin.getConfigManager().STORAGE_MODE == StorageMode.ITEM) {
+            meta.getPersistentDataContainer().set(WAYPOINT_KEY, PersistentDataType.STRING, jsonObject.toString());
+        }
+
+        if (plugin.getConfigManager().STORAGE_MODE == StorageMode.PLAYER) {
+            HoloPlayer holoPlayer = plugin.getPlayerManager().getPlayer(player);
+            holoPlayer.setData("holo_waypoint", jsonObject);
+            storage.savePlayer(holoPlayer);
+        }
+
+        if (plugin.getConfigManager().STORAGE_MODE == StorageMode.UUID) {
+            storage.saveHolo(id, jsonObject);
+        }
+
+        itemStack.setItemMeta(meta);
+
+        if (!plugin.getHoloManager().isHolo(player.getInventory().getItemInMainHand())) return;
+        player.getInventory().setItemInMainHand(itemStack);
+    }
+
+    public HoloWaypoint loadHoloWaypoint(Player player, ItemStack itemStack) {
+        if (itemStack == null) return null;
+
+        ItemMeta meta = itemStack.getItemMeta();
+        if (meta == null) return null;
+
+        HoloPlayer holoPlayer = plugin.getPlayerManager().getPlayer(player);
+        int slots = holoPlayer.getSlots(HoloType.HOLOWAYPOINT);
+
+        PersistentDataContainer dataContainer = meta.getPersistentDataContainer();
+        int id;
+        NamespacedKey idKey = new NamespacedKey(plugin, "id");
+
+        if (!dataContainer.has(idKey, PersistentDataType.INTEGER)) {
+            id = storage.getNextID();
+        } else {
+            Integer storedID = dataContainer.get(idKey, PersistentDataType.INTEGER);
+            id = Objects.requireNonNullElseGet(storedID, storage::getNextID);
+        }
+
+        if (!dataContainer.has(WAYPOINT_KEY, PersistentDataType.STRING)) return null;
+
+        dataContainer.set(idKey, PersistentDataType.INTEGER, id);
+
+        JsonObject jsonObject = new JsonObject();
+        if (plugin.getConfigManager().STORAGE_MODE == StorageMode.ITEM) {
+            jsonObject = JsonParser.parseString(Objects.requireNonNull(dataContainer.get(WAYPOINT_KEY, PersistentDataType.STRING))).getAsJsonObject();
+        }
+        if (plugin.getConfigManager().STORAGE_MODE == StorageMode.PLAYER) {
+            jsonObject = holoPlayer.getData().getOrDefault("holo_waypoint", new JsonObject());
+        }
+        if (plugin.getConfigManager().STORAGE_MODE == StorageMode.UUID) {
+            jsonObject = storage.getHolo(id);
+        }
+
+        Map<Integer, WaypointData> waypointMap = new HashMap<>();
+        for (int slot = 0; slot < 16; slot++) {
+            String slotKey = "slot_" + slot;
+            if (!jsonObject.has(slotKey)) continue;
+            JsonObject wpJson = jsonObject.get(slotKey).getAsJsonObject();
+            waypointMap.put(slot, WaypointData.fromJsonObject(wpJson));
+        }
+
+        itemStack.setItemMeta(meta);
+        return new HoloWaypoint(player, waypointMap, itemStack, slots);
     }
 
     public Storage getStorage() {

@@ -14,6 +14,40 @@ bridge:
   far_distance: "&cLa distancia es demasiado larga"
   step_angle: "&cLa inclinación es demasiado pronunciada"
 
+waypoint:
+  empty_slot: "&7Ranura Vacía"
+  click_to_save: "&aClick para guardar ubicación"
+  click_to_track: "&eClick para rastrear"
+  click_to_delete: "&cShift+Click para eliminar"
+  created: "&aWaypoint guardado exitosamente!"
+  deleted: "&cWaypoint eliminado!"
+  tracking: "&eRastreando waypoint: &f%s"
+  distance: "&7Distancia: &e%d bloques"
+  world: "&7Mundo: &f%s"
+  menu_title: "&#2d3436HoloWaypoint - Gestor"
+  save_btn: "&#00ffaa&l[+] Guardar Waypoint Aquí"
+  save_lore: "&#a1c4fdGuarda tu posición actual como nuevo waypoint."
+  rename_prompt: "&#00d2ff&l[HoloWaypoint] &#ffffffEscribe el nuevo nombre en el chat (o &#ff7675'cancelar'&#ffffff):"
+  rename_cancel: "&#ff7675Cambio de nombre cancelado."
+  rename_success: "&#00ffaa✔ Nombre cambiado a: &#00d2ff%s"
+  rename_lore: "&#0984e3▸ Clic izquierdo: &#ffffffRenombrar punto"
+  delete_lore: "&#d63031▸ Shift + Clic: &#ffffffEliminar punto"
+
+radar:
+  no_ore: "&7Sin minerales cercanos"
+  ore_found: "&aMineral detectado"
+  distance: "&7Distancia: &e%d bloques"
+  depth: "&7Profundidad: &fY = %d"
+  menu_title: "&#2d3436Radar - Filtro de Minerales"
+  filter_detecting: "&#00ffaa✔ Detectando"
+  filter_disable_click: "&#a1c4fdClic para desactivar"
+  filter_ignored: "&#ff7675✖ Ignorado"
+  filter_enable_click: "&#a1c4fdClic para activar"
+
+shield:
+  deflected: "&b¡Proyectil desviado!"
+  cooldown: "&#ff7675El HoloShield está en enfriamiento: &#ffeaa7%ds"
+
 others:
   config_reloaded: "&aConfiguracion recargada con exito!"
   no_permission: "&cNo tienes permiso para hacer esto!"

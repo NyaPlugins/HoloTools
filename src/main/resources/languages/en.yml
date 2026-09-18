@@ -14,6 +14,40 @@ bridge:
   far_distance: "&cThe distance is too far"
   step_angle: "&cThe angle is too steep."
 
+waypoint:
+  empty_slot: "&7Empty Slot"
+  click_to_save: "&aClick to save current location"
+  click_to_track: "&eClick to track"
+  click_to_delete: "&cShift+Click to delete"
+  created: "&aWaypoint saved successfully!"
+  deleted: "&cWaypoint removed!"
+  tracking: "&eTracking waypoint: &f%s"
+  distance: "&7Distance: &e%d blocks"
+  world: "&7World: &f%s"
+  menu_title: "&#2d3436HoloWaypoint - Manager"
+  save_btn: "&#00ffaa&l[+] Save Waypoint Here"
+  save_lore: "&#a1c4fdSaves current location as a new waypoint."
+  rename_prompt: "&#00d2ff&l[HoloWaypoint] &#ffffffType new name in chat (or &#ff7675'cancel'&#ffffff):"
+  rename_cancel: "&#ff7675Renaming cancelled."
+  rename_success: "&#00ffaa✔ Name changed to: &#00d2ff%s"
+  rename_lore: "&#0984e3▸ Left click: &#ffffffRename waypoint"
+  delete_lore: "&#d63031▸ Shift + Click: &#ffffffDelete waypoint"
+
+radar:
+  no_ore: "&7No nearby ores"
+  ore_found: "&aOre detected"
+  distance: "&7Distance: &e%d blocks"
+  depth: "&7Depth: &fY = %d"
+  menu_title: "&#2d3436Radar - Ore Filter"
+  filter_detecting: "&#00ffaa✔ Detecting"
+  filter_disable_click: "&#a1c4fdClick to disable"
+  filter_ignored: "&#ff7675✖ Ignored"
+  filter_enable_click: "&#a1c4fdClick to enable"
+
+shield:
+  deflected: "&bProjectile deflected!"
+  cooldown: "&#ff7675HoloShield is on cooldown: &#ffeaa7%ds"
+
 others:
   config_reloaded: "&aConfiguration reloaded successfully!"
   no_permission: "&cYou do not have permission to do this"

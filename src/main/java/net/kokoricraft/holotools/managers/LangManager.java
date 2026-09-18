@@ -24,6 +24,34 @@ public class LangManager {
     public String CONFIG_RELOADED;
     public String BRIDGE_FAR_DISTANCE;
     public String BRIDGE_STEEP_ANGLE;
+    public String WAYPOINT_EMPTY_SLOT;
+    public String WAYPOINT_CLICK_TO_SAVE;
+    public String WAYPOINT_CLICK_TO_TRACK;
+    public String WAYPOINT_CLICK_TO_DELETE;
+    public String WAYPOINT_CREATED;
+    public String WAYPOINT_DELETED;
+    public String WAYPOINT_TRACKING;
+    public String WAYPOINT_DISTANCE;
+    public String WAYPOINT_WORLD;
+    public String WAYPOINT_MENU_TITLE;
+    public String WAYPOINT_SAVE_BTN;
+    public String WAYPOINT_SAVE_LORE;
+    public String WAYPOINT_RENAME_PROMPT;
+    public String WAYPOINT_RENAME_CANCEL;
+    public String WAYPOINT_RENAME_SUCCESS;
+    public String WAYPOINT_RENAME_LORE;
+    public String WAYPOINT_DELETE_LORE;
+    public String RADAR_NO_ORE;
+    public String RADAR_ORE_FOUND;
+    public String RADAR_DISTANCE;
+    public String RADAR_DEPTH;
+    public String RADAR_MENU_TITLE;
+    public String RADAR_FILTER_DETECTING;
+    public String RADAR_FILTER_DISABLE_CLICK;
+    public String RADAR_FILTER_IGNORED;
+    public String RADAR_FILTER_ENABLE_CLICK;
+    public String SHIELD_DEFLECTED;
+    public String SHIELD_COOLDOWN;
 
     public LangManager(HoloTools plugin){
         this.plugin = plugin;
@@ -45,6 +73,37 @@ public class LangManager {
 
         BRIDGE_FAR_DISTANCE = getStringWithDefault(messages, "bridge.far_distance");
         BRIDGE_STEEP_ANGLE = getStringWithDefault(messages, "bridge.step_angle");
+
+        WAYPOINT_EMPTY_SLOT = getStringWithDefault(messages, "waypoint.empty_slot");
+        WAYPOINT_CLICK_TO_SAVE = getStringWithDefault(messages, "waypoint.click_to_save");
+        WAYPOINT_CLICK_TO_TRACK = getStringWithDefault(messages, "waypoint.click_to_track");
+        WAYPOINT_CLICK_TO_DELETE = getStringWithDefault(messages, "waypoint.click_to_delete");
+        WAYPOINT_CREATED = getStringWithDefault(messages, "waypoint.created");
+        WAYPOINT_DELETED = getStringWithDefault(messages, "waypoint.deleted");
+        WAYPOINT_TRACKING = getStringWithDefault(messages, "waypoint.tracking");
+        WAYPOINT_DISTANCE = getStringWithDefault(messages, "waypoint.distance");
+        WAYPOINT_WORLD = getStringWithDefault(messages, "waypoint.world");
+        WAYPOINT_MENU_TITLE = getStringWithDefault(messages, "waypoint.menu_title");
+        WAYPOINT_SAVE_BTN = getStringWithDefault(messages, "waypoint.save_btn");
+        WAYPOINT_SAVE_LORE = getStringWithDefault(messages, "waypoint.save_lore");
+        WAYPOINT_RENAME_PROMPT = getStringWithDefault(messages, "waypoint.rename_prompt");
+        WAYPOINT_RENAME_CANCEL = getStringWithDefault(messages, "waypoint.rename_cancel");
+        WAYPOINT_RENAME_SUCCESS = getStringWithDefault(messages, "waypoint.rename_success");
+        WAYPOINT_RENAME_LORE = getStringWithDefault(messages, "waypoint.rename_lore");
+        WAYPOINT_DELETE_LORE = getStringWithDefault(messages, "waypoint.delete_lore");
+
+        RADAR_NO_ORE = getStringWithDefault(messages, "radar.no_ore");
+        RADAR_ORE_FOUND = getStringWithDefault(messages, "radar.ore_found");
+        RADAR_DISTANCE = getStringWithDefault(messages, "radar.distance");
+        RADAR_DEPTH = getStringWithDefault(messages, "radar.depth");
+        RADAR_MENU_TITLE = getStringWithDefault(messages, "radar.menu_title");
+        RADAR_FILTER_DETECTING = getStringWithDefault(messages, "radar.filter_detecting");
+        RADAR_FILTER_DISABLE_CLICK = getStringWithDefault(messages, "radar.filter_disable_click");
+        RADAR_FILTER_IGNORED = getStringWithDefault(messages, "radar.filter_ignored");
+        RADAR_FILTER_ENABLE_CLICK = getStringWithDefault(messages, "radar.filter_enable_click");
+
+        SHIELD_DEFLECTED = getStringWithDefault(messages, "shield.deflected");
+        SHIELD_COOLDOWN = getStringWithDefault(messages, "shield.cooldown");
 
         NO_PERMISSION = getStringWithDefault(messages, "others.no_permission");
         CONFIG_RELOADED = getStringWithDefault(messages, "others.config_reloaded");

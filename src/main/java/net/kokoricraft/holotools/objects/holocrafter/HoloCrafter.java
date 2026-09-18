@@ -57,8 +57,6 @@ public class HoloCrafter extends Holo implements HoloBase {
             HoloColor color = colors.getColor(fromSlot).unselected().clone();
             from.removeExtraY();
             from.setColor(color);
-            if (!color.getSequence().isEmpty())
-                from.setIgnoreColorChange(5);
             if (fromSlot != 0) {
                 hover.setAir();
                 holoCrafterSlot.setText(" ");
@@ -71,9 +69,6 @@ public class HoloCrafter extends Holo implements HoloBase {
 
             to.addExtraYSize(0.45f);
             to.setColor(color);
-
-            if (!color.getSequence().isEmpty())
-                to.setIgnoreColorChange(5);
 
             if (toSlot != 0) {
                 if (holoCrafterSlot.getRecipe() != null) {

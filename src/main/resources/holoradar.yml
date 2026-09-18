@@ -1,0 +1,97 @@
+item:
+  name: "&bHoloRadar"
+  lore:
+    - ""
+    - "&eDirectional 360 ore radar!"
+  material: "PLAYER_HEAD"
+  texture: "http://textures.minecraft.net/texture/c02e1c3a647d6ccb23dcbc84a8ff3db6d42e61c34a317bf6f6df8a958e8e604f"
+  custom_model_data: 0
+
+default_slots: 8
+radius: 15
+scan_interval: 20
+
+tooltip:
+  enabled: true
+
+default_color:
+  unselected:
+    hex: "#102030"
+    alpha: 130
+  selected:
+    hex: "#1b3550"
+    alpha: 180
+
+ores:
+  ancient_debris:
+    name: "&c&lAncient Debris"
+    icon: "ANCIENT_DEBRIS"
+    priority: 100
+    hex: "#ff5500"
+    materials:
+      - "ANCIENT_DEBRIS"
+  diamond:
+    name: "&b&lDiamond Ore"
+    icon: "DIAMOND"
+    priority: 90
+    hex: "#00ffff"
+    materials:
+      - "DIAMOND_ORE"
+      - "DEEPSLATE_DIAMOND_ORE"
+  emerald:
+    name: "&a&lEmerald Ore"
+    icon: "EMERALD"
+    priority: 80
+    hex: "#00ff55"
+    materials:
+      - "EMERALD_ORE"
+      - "DEEPSLATE_EMERALD_ORE"
+  gold:
+    name: "&e&lGold Ore"
+    icon: "RAW_GOLD"
+    priority: 70
+    hex: "#ffcc00"
+    materials:
+      - "GOLD_ORE"
+      - "DEEPSLATE_GOLD_ORE"
+      - "NETHER_GOLD_ORE"
+  iron:
+    name: "&f&lIron Ore"
+    icon: "RAW_IRON"
+    priority: 60
+    hex: "#d0d0d0"
+    materials:
+      - "IRON_ORE"
+      - "DEEPSLATE_IRON_ORE"
+  redstone:
+    name: "&4&lRedstone Ore"
+    icon: "REDSTONE"
+    priority: 50
+    hex: "#ff2222"
+    materials:
+      - "REDSTONE_ORE"
+      - "DEEPSLATE_REDSTONE_ORE"
+  lapis:
+    name: "&1&lLapis Ore"
+    icon: "LAPIS_LAZULI"
+    priority: 40
+    hex: "#2244ff"
+    materials:
+      - "LAPIS_ORE"
+      - "DEEPSLATE_LAPIS_ORE"
+  coal:
+    name: "&8&lCoal Ore"
+    icon: "COAL"
+    priority: 30
+    hex: "#333333"
+    materials:
+      - "COAL_ORE"
+      - "DEEPSLATE_COAL_ORE"
+  copper:
+    name: "&6&lCopper Ore"
+    icon: "RAW_COPPER"
+    priority: 20
+    hex: "#d97343"
+    materials:
+      - "COPPER_ORE"
+      - "DEEPSLATE_COPPER_ORE"

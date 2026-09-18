@@ -42,6 +42,22 @@ public class ConfigManager {
     public NekoItem BRIDGE_ITEM;
     public int BRIDGE_DURATION = 30;
 
+    public List<net.kokoricraft.holotools.objects.holoshield.ShieldProfile> shieldProfiles = new ArrayList<>();
+    public NekoItem SHIELD_ITEM;
+    public double SHIELD_SPEED = 1.5;
+    public boolean SHIELD_SOUND = true;
+    public boolean SHIELD_PARTICLES = true;
+
+    public NekoItem WAYPOINT_ITEM;
+    public List<HoloPanelsColors> WAYPOINT_PANELS_COLORS;
+
+    public NekoItem RADAR_ITEM;
+    public int RADAR_RADIUS = 24;
+    public int RADAR_SCAN_INTERVAL = 20;
+    public HoloColor RADAR_DEFAULT_UNSELECTED;
+    public HoloColor RADAR_DEFAULT_SELECTED;
+    public List<net.kokoricraft.holotools.objects.holoradar.OreProfile> RADAR_ORES = new ArrayList<>();
+
     public static final DualColor DUAL_COLOR_DEF = new DualColor(HoloColors.WHITE.getColor(), HoloColors.WHITE_SELECTED.getColor());
 
     public ConfigManager(HoloTools plugin) {
@@ -128,6 +144,86 @@ public class ConfigManager {
         }
 
         bridge.update();
+
+        //Shield configuration.
+        NekoConfig shield = new NekoConfig("holoshield.yml", plugin);
+        SHIELD_ITEM = new NekoItem(plugin, shield.getConfigurationSection("item"));
+        SHIELD_ITEM.setTag("holoshield", "yes");
+        SHIELD_ITEM.setDefaultMaterial(Material.SHIELD);
+        SHIELD_ITEM.setUnbreakable(true);
+        SHIELD_SPEED = shield.getDouble("reflection_speed", 1.5);
+        SHIELD_SOUND = shield.getBoolean("sound_enabled", true);
+        SHIELD_PARTICLES = shield.getBoolean("particles_enabled", true);
+        shieldProfiles.clear();
+        ConfigurationSection shieldProfilesSec = shield.getConfigurationSection("profiles");
+        if (shieldProfilesSec != null) {
+            for (String key : shieldProfilesSec.getKeys(false)) {
+                boolean needPermission = shieldProfilesSec.getBoolean(key + ".need_permission", false);
+                String permission = shieldProfilesSec.getString(key + ".permission", "holotools.holoshield.profile." + key);
+                int priority = shieldProfilesSec.getInt(key + ".priority", 0);
+                int duration = shieldProfilesSec.getInt(key + ".duration", 10);
+                int cooldown = shieldProfilesSec.getInt(key + ".cooldown", 25);
+                String hex = shieldProfilesSec.getString(key + ".color", "#19a7d2");
+                int alpha = shieldProfilesSec.getInt(key + ".color_alpha", 130);
+                String warnHex = shieldProfilesSec.getString(key + ".warning_color", "#ff2222");
+                int warnAlpha = shieldProfilesSec.getInt(key + ".warning_alpha", 170);
+                HoloColor color = HoloColor.fromHex(hex, alpha);
+                HoloColor warnColor = HoloColor.fromHex(warnHex, warnAlpha);
+                shieldProfiles.add(new net.kokoricraft.holotools.objects.holoshield.ShieldProfile(needPermission, permission, priority, duration, cooldown, color, warnColor));
+            }
+            shieldProfiles.sort((a, b) -> Integer.compare(b.priority(), a.priority()));
+        }
+        shield.update();
+
+        //Waypoint configuration.
+        NekoConfig waypoint = new NekoConfig("holowaypoint.yml", plugin);
+        WAYPOINT_ITEM = new NekoItem(plugin, waypoint.getConfigurationSection("item"));
+        WAYPOINT_ITEM.setTag("holo", "yes");
+        WAYPOINT_ITEM.setTag("holo_waypoint", new JsonObject().toString());
+        DEFAULT_SLOTS.put(HoloType.HOLOWAYPOINT, waypoint.getInt("default_slots", 8));
+        if (!waypoint.contains("colors_lists"))
+            generateDefaultConfig(waypoint, HoloType.HOLOWAYPOINT);
+        WAYPOINT_PANELS_COLORS = getPanelsColors(waypoint);
+        waypoint.update();
+
+        //Radar configuration.
+        NekoConfig radar = new NekoConfig("holoradar.yml", plugin);
+        RADAR_ITEM = new NekoItem(plugin, radar.getConfigurationSection("item"));
+        RADAR_ITEM.setTag("holo", "yes");
+        RADAR_ITEM.setTag("holo_radar", "yes");
+        DEFAULT_SLOTS.put(HoloType.HOLORADAR, radar.getInt("default_slots", 8));
+        RADAR_RADIUS = radar.getInt("radius", 24);
+        RADAR_SCAN_INTERVAL = radar.getInt("scan_interval", 20);
+
+        String defUnselectedHex = radar.getString("default_color.unselected.hex", "#102030");
+        int defUnselectedAlpha = radar.getInt("default_color.unselected.alpha", 130);
+        RADAR_DEFAULT_UNSELECTED = HoloColor.fromHex(defUnselectedHex, defUnselectedAlpha);
+
+        String defSelectedHex = radar.getString("default_color.selected.hex", "#1b3550");
+        int defSelectedAlpha = radar.getInt("default_color.selected.alpha", 180);
+        RADAR_DEFAULT_SELECTED = HoloColor.fromHex(defSelectedHex, defSelectedAlpha);
+
+        RADAR_ORES.clear();
+        ConfigurationSection oresSec = radar.getConfigurationSection("ores");
+        if (oresSec != null) {
+            for (String key : oresSec.getKeys(false)) {
+                String name = oresSec.getString(key + ".name", key);
+                Material icon = Material.valueOf(oresSec.getString(key + ".icon", "DIAMOND").toUpperCase());
+                int priority = oresSec.getInt(key + ".priority", 0);
+                String hex = oresSec.getString(key + ".hex", "#00ffff");
+                HoloColor color = HoloColor.fromHex(hex, 180);
+                List<String> matNames = oresSec.getStringList(key + ".materials");
+                java.util.Set<Material> mats = new java.util.HashSet<>();
+                for (String m : matNames) {
+                    try {
+                        mats.add(Material.valueOf(m.toUpperCase()));
+                    } catch (Exception ignored) {}
+                }
+                RADAR_ORES.add(new net.kokoricraft.holotools.objects.holoradar.OreProfile(key, name, icon, priority, color, mats));
+            }
+            RADAR_ORES.sort((a, b) -> Integer.compare(b.priority(), a.priority()));
+        }
+        radar.update();
     }
 
     private void generateDefaultConfig(NekoConfig config, HoloType type) {

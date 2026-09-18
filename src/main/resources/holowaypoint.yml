@@ -1,0 +1,37 @@
+item:
+  name: "&bHoloWaypoint"
+  lore:
+    - ""
+    - "&eSave and track your waypoints!"
+  material: "PLAYER_HEAD"
+  texture: "http://textures.minecraft.net/texture/c234a413d077e5d898516eeef6a92fce7747ea7e9f3b14620f4c9c1de2b1ff"
+  custom_model_data: 0
+
+default_slots: 8
+
+tooltip:
+  enabled: true
+
+colors:
+  default:
+    need_permission: false
+    permission: "holotools.holowaypoint.color.default"
+    slots:
+      default_slot: cyan
+      slot_0: cyan
+      slot_1: cyan
+      slot_2: cyan
+      slot_3: cyan
+      slot_4: cyan
+      slot_5: cyan
+      slot_6: cyan
+      slot_7: cyan
+
+colors_lists:
+  cyan:
+    unselected:
+      hex: "#19a7d2"
+      alpha: 150
+    selected:
+      hex: "#28bae6"
+      alpha: 200

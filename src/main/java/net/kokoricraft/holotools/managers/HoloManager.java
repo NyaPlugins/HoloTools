@@ -79,6 +79,23 @@ public class HoloManager {
             HoloWardrobe holoWardrobe = plugin.getDataManager().loadHoloWardrobe(player, itemStack);
             holoWardrobe.setVisible(true);
             opened.put(player, holoWardrobe);
+            return;
+        }
+
+        if (meta.getPersistentDataContainer().has(plugin.getDataManager().WAYPOINT_KEY, PersistentDataType.STRING)) {
+            net.kokoricraft.holotools.objects.holowaypoint.HoloWaypoint holoWaypoint = plugin.getDataManager().loadHoloWaypoint(player, itemStack);
+            if (holoWaypoint != null) {
+                holoWaypoint.setVisible(true);
+                opened.put(player, holoWaypoint);
+            }
+            return;
+        }
+
+        if (meta.getPersistentDataContainer().has(plugin.getDataManager().RADAR_KEY, PersistentDataType.STRING)) {
+            int slots = plugin.getPlayerManager().getPlayer(player).getSlots(HoloType.HOLORADAR);
+            net.kokoricraft.holotools.objects.holoradar.HoloRadar holoRadar = new net.kokoricraft.holotools.objects.holoradar.HoloRadar(player, itemStack, slots);
+            holoRadar.setVisible(true);
+            opened.put(player, holoRadar);
         }
     }
 
@@ -105,7 +122,14 @@ public class HoloManager {
     }
 
     public HoloPanelsColors getHoloColor(Player player, HoloType type) {
-        List<HoloPanelsColors> colors = type == HoloType.HOLOCRAFTER ? plugin.getConfigManager().CRAFTER_PANELS_COLORS : plugin.getConfigManager().WARDROBE_PANELS_COLORS;
+        List<HoloPanelsColors> colors;
+        switch (type) {
+            case HOLOCRAFTER -> colors = plugin.getConfigManager().CRAFTER_PANELS_COLORS;
+            case HOLOWARDROBE -> colors = plugin.getConfigManager().WARDROBE_PANELS_COLORS;
+            case HOLOWAYPOINT -> colors = plugin.getConfigManager().WAYPOINT_PANELS_COLORS;
+            default -> colors = null;
+        }
+        if (colors == null) return null;
         return colors.stream().filter(color -> color.canUse(player)).findFirst().orElse(null);
     }
 

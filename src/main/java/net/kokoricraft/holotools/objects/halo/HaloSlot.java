@@ -1,6 +1,7 @@
 package net.kokoricraft.holotools.objects.halo;
 
 import net.kokoricraft.holotools.HoloTools;
+import net.kokoricraft.holotools.enums.HoloSize;
 import net.kokoricraft.holotools.utils.objects.HoloColor;
 import net.kokoricraft.holotools.version.HoloItemDisplay;
 import net.kokoricraft.holotools.version.HoloTextDisplay;
@@ -69,16 +70,29 @@ public class HaloSlot {
 
     public void setColor(HoloColor color) {
         this.color = color;
+        if (color == null) return;
+
+        HoloColor toApply;
+        if (!color.getSequence().isEmpty()) {
+            HoloColor.TimedColor timedColor = color.getColor(this.tick);
+            toApply = (timedColor != null) ? timedColor.color() : color;
+        } else {
+            toApply = color;
+        }
+
+        this.lastAppliedColor = toApply;
+        this.ignoreColorChange = 0;
+
         if (background == null) {
-            this.defColor = color;
+            this.defColor = toApply;
             return;
         }
 
-        setInternalColor(color, 4);
+        setInternalColor(toApply, 4);
     }
 
     private void setInternalColor(HoloColor color, int duration) {
-        if (ignoreColorChange > 0) return;
+        if (background == null || color == null) return;
 
         background.setColor(color);
         background.interpolation(-1, duration);
@@ -86,29 +100,39 @@ public class HaloSlot {
     }
 
     public void addExtraYSize(float extraY) {
+        if (background == null) return;
+        float deltaY = (extraY * HoloSize.BASE_HEIGHT) / 2.0f;
+        background.setTranslation((float) x, (float) (y - deltaY), (float) z);
         background.setScale(x_size, y_size + extraY, z_size);
+        background.update();
     }
 
     public void removeExtraY() {
+        if (background == null) return;
+        background.setTranslation((float) x, (float) y, (float) z);
         background.setScale(x_size, y_size, z_size);
+        background.update();
     }
 
     public void tick() {
         if (color != null && background != null) {
-            HoloColor.TimedColor timedColor = color.getColor(tick);
+            if (ignoreColorChange > 0) {
+                ignoreColorChange--;
+            } else {
+                HoloColor.TimedColor timedColor = color.getColor(tick);
 
-            if (timedColor != null) {
-                HoloColor next = timedColor.color();
+                if (timedColor != null) {
+                    HoloColor next = timedColor.color();
 
-                if (lastAppliedColor == null || next.asARGB() != lastAppliedColor.asARGB()) {
-                    setInternalColor(next, timedColor.duration());
-                    lastAppliedColor = next;
+                    if (lastAppliedColor == null || next.asARGB() != lastAppliedColor.asARGB()) {
+                        setInternalColor(next, timedColor.duration());
+                        lastAppliedColor = next;
+                    }
                 }
             }
         }
 
         tick++;
-        if (ignoreColorChange > 0) ignoreColorChange--;
     }
 
     public void setIgnoreColorChange(int duration) {

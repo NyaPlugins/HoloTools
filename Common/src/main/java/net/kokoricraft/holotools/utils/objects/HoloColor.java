@@ -78,6 +78,7 @@ public final class HoloColor implements Cloneable {
         if (sequence.isEmpty()) return null;
 
         int totalDuration = sequence.stream().mapToInt(TimedColor::duration).sum();
+        if (totalDuration <= 0) return sequence.get(0);
         int loopTick = tick % totalDuration;
 
         int currentTick = 0;

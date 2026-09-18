@@ -301,6 +301,12 @@ public class Commands implements CommandExecutor {
                     item = plugin.getConfigManager().WARDROBE_ITEM.getItem("id", plugin.getDataManager().getStorage().getNextID());
             case "holobridge" ->
                 item = plugin.getConfigManager().BRIDGE_ITEM.getItem("id", plugin.getDataManager().getStorage().getNextID());
+            case "holoshield" ->
+                item = plugin.getConfigManager().SHIELD_ITEM.getItem("id", plugin.getDataManager().getStorage().getNextID());
+            case "holowaypoint" ->
+                item = plugin.getConfigManager().WAYPOINT_ITEM.getItem("id", plugin.getDataManager().getStorage().getNextID());
+            case "holoradar" ->
+                item = plugin.getConfigManager().RADAR_ITEM.getItem("id", plugin.getDataManager().getStorage().getNextID());
             default -> {
                 sender.sendMessage(plugin.getUtils().color("&cTool does not exist."));
                 return;

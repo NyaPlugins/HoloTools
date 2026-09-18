@@ -31,12 +31,12 @@ public abstract class Holo implements Tickable, HoloBase {
 
         HoloSize sizeData = HoloSize.getBySlots(size);
 
-        for (int i = 0; i < size; i++) {//-0.012f
+        for (int i = 0; i < size; i++) {
             float rotation = ((360.0f / size * i - 90.0f) + 360) % 360;
 
             float panelSize = sizeData.getXSize();
-            float x = (-0.012553802f * panelSize);
-            HaloSlot slot = new HaloSlot(i, x/*sizeData.getX()*/, height, sizeData.getZ(), panelSize/*sizeData.getXSize()*/, sizeData.getYSize(), sizeData.getZSize(), rotation, this);
+            double x = sizeData.getX();
+            HaloSlot slot = new HaloSlot(i, x, height, sizeData.getZ(), panelSize, sizeData.getYSize(), sizeData.getZSize(), rotation, this);
             slots.put(i, slot);
         }
     }

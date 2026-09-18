@@ -30,6 +30,7 @@ public final class HoloTools extends JavaPlugin {
     private ConfigManager configManager;
     private LangManager langManager;
     private BridgesManager bridgeManager;
+    private ShieldManager shieldManager;
     private UpdateChecker updateChecker;
     public boolean UPDATED = true;
     public String VERSION;
@@ -86,6 +87,7 @@ public final class HoloTools extends JavaPlugin {
         playerManager = new PlayerManager(this);
         langManager = new LangManager(this);
         bridgeManager = new BridgesManager(this);
+        shieldManager = new ShieldManager(this);
 
         new Metrics(this, 23286);
     }
@@ -96,6 +98,9 @@ public final class HoloTools extends JavaPlugin {
         pm.registerEvents(new HoloCrafterListener(this), this);
         pm.registerEvents(new PlayerListener(this), this);
         pm.registerEvents(new HoloBridgeListener(), this);
+        pm.registerEvents(new HoloShieldListener(this), this);
+        pm.registerEvents(new HoloWaypointListener(this), this);
+        pm.registerEvents(new HoloRadarListener(this), this);
 //        pm.registerEvents(new TestListeners(this), this);
     }
 
@@ -142,6 +147,9 @@ public final class HoloTools extends JavaPlugin {
     }
     public BridgesManager getBridgeManager() {
         return bridgeManager;
+    }
+    public ShieldManager getShieldManager() {
+        return shieldManager;
     }
 
     public UpdateChecker getUpdateChecker(){

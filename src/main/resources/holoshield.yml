@@ -1,0 +1,33 @@
+item:
+  name: "&bHoloShield"
+  lore:
+    - ""
+    - "&eSpherical defensive barrier!"
+    - "&7Blocks damage and reflects projectiles"
+  custom_model_data: 0
+
+reflection_speed: 1.5
+sound_enabled: true
+particles_enabled: true
+
+profiles:
+  default:
+    need_permission: false
+    permission: "holotools.holoshield.profile.default"
+    priority: 1
+    duration: 10
+    cooldown: 25
+    color: "#19a7d2"
+    color_alpha: 130
+    warning_color: "#ff2222"
+    warning_alpha: 170
+  vip:
+    need_permission: true
+    permission: "holotools.holoshield.profile.vip"
+    priority: 10
+    duration: 15
+    cooldown: 18
+    color: "#00f0ff"
+    color_alpha: 140
+    warning_color: "#ff1111"
+    warning_alpha: 180

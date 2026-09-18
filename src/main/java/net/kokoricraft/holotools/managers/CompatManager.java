@@ -35,6 +35,7 @@ public class CompatManager {
             this.put("26.1.1", "v26_1");
             this.put("26.1.2", "v26_1");
             this.put("26.2", "v26_2");
+            this.put("26.3", "v26_2");
         }
     };
 
