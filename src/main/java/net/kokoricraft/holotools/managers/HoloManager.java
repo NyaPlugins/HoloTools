@@ -5,7 +5,9 @@ import net.kokoricraft.holotools.enums.HoloType;
 import net.kokoricraft.holotools.objects.colors.HoloPanelsColors;
 import net.kokoricraft.holotools.objects.halo.Holo;
 import net.kokoricraft.holotools.objects.holocrafter.HoloCrafter;
+import net.kokoricraft.holotools.objects.holoradar.HoloRadar;
 import net.kokoricraft.holotools.objects.holowardrobe.HoloWardrobe;
+import net.kokoricraft.holotools.objects.holowaypoint.HoloWaypoint;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -40,8 +42,7 @@ public class HoloManager {
 
         if (hasHolo && preHolo) {
             Holo holo = opened.get(player);
-            ItemStack old = holo.getItemStack();
-            if (!old.equals(itemStack)) {
+            if (!isSameHolo(holo, itemStack)) {
                 holo.remove("remove check player 0");
                 enable(player);
                 return;
@@ -83,7 +84,7 @@ public class HoloManager {
         }
 
         if (meta.getPersistentDataContainer().has(plugin.getDataManager().WAYPOINT_KEY, PersistentDataType.STRING)) {
-            net.kokoricraft.holotools.objects.holowaypoint.HoloWaypoint holoWaypoint = plugin.getDataManager().loadHoloWaypoint(player, itemStack);
+            HoloWaypoint holoWaypoint = plugin.getDataManager().loadHoloWaypoint(player, itemStack);
             if (holoWaypoint != null) {
                 holoWaypoint.setVisible(true);
                 opened.put(player, holoWaypoint);
@@ -93,7 +94,7 @@ public class HoloManager {
 
         if (meta.getPersistentDataContainer().has(plugin.getDataManager().RADAR_KEY, PersistentDataType.STRING)) {
             int slots = plugin.getPlayerManager().getPlayer(player).getSlots(HoloType.HOLORADAR);
-            net.kokoricraft.holotools.objects.holoradar.HoloRadar holoRadar = new net.kokoricraft.holotools.objects.holoradar.HoloRadar(player, itemStack, slots);
+            HoloRadar holoRadar = new HoloRadar(player, itemStack, slots);
             holoRadar.setVisible(true);
             opened.put(player, holoRadar);
         }
@@ -142,5 +143,46 @@ public class HoloManager {
         }, time);
 
         tasks.put(player, task);
+    }
+
+    public boolean isSameHolo(Holo holo, ItemStack newItem) {
+        if (holo == null || newItem == null || !newItem.hasItemMeta()) return false;
+        ItemMeta newMeta = newItem.getItemMeta();
+        if (newMeta == null) return false;
+        PersistentDataContainer newPdc = newMeta.getPersistentDataContainer();
+
+        ItemStack oldItem = holo.getItemStack();
+        if (oldItem == null || !oldItem.hasItemMeta()) return false;
+        ItemMeta oldMeta = oldItem.getItemMeta();
+        if (oldMeta == null) return false;
+        PersistentDataContainer oldPdc = oldMeta.getPersistentDataContainer();
+
+        if (holo instanceof HoloCrafter && newPdc.has(plugin.getDataManager().CRAFTER_KEY, PersistentDataType.STRING)) {
+            return matchHoloId(oldPdc, newPdc);
+        }
+
+        if (holo instanceof HoloWardrobe && newPdc.has(plugin.getDataManager().WARDROBE_KEY, PersistentDataType.STRING)) {
+            return matchHoloId(oldPdc, newPdc);
+        }
+
+        if (holo instanceof HoloWaypoint && newPdc.has(plugin.getDataManager().WAYPOINT_KEY, PersistentDataType.STRING)) {
+            return matchHoloId(oldPdc, newPdc);
+        }
+
+        if (holo instanceof HoloRadar && newPdc.has(plugin.getDataManager().RADAR_KEY, PersistentDataType.STRING)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean matchHoloId(PersistentDataContainer oldPdc, PersistentDataContainer newPdc) {
+        NamespacedKey idKey = new NamespacedKey(plugin, "id");
+        Integer oldId = oldPdc.get(idKey, PersistentDataType.INTEGER);
+        Integer newId = newPdc.get(idKey, PersistentDataType.INTEGER);
+        if (oldId != null && newId != null) {
+            return oldId.equals(newId);
+        }
+        return oldId == null && newId == null;
     }
 }

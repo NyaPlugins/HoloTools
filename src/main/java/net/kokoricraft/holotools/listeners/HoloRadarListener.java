@@ -28,10 +28,10 @@ public class HoloRadarListener implements Listener {
 
         if (!(event.getWhoClicked() instanceof Player player)) return;
         int rawSlot = event.getRawSlot();
-        if (rawSlot < 10 || rawSlot > 16) return;
+        int index = HoloRadarMenu.getOreIndex(rawSlot);
+        if (index == -1) return;
 
         List<OreProfile> ores = plugin.getConfigManager().RADAR_ORES;
-        int index = rawSlot - 10;
         if (index >= ores.size()) return;
 
         OreProfile ore = ores.get(index);

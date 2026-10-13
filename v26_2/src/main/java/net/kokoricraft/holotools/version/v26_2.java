@@ -48,6 +48,21 @@ import java.util.*;
 
 public class v26_2 implements Compat {
     private final Map<Integer, List<Entity>> passengers = new HashMap<>();
+    private Field cachedVehicleField = null;
+    private Field cachedPassengersField = null;
+
+    private void resolvePassengerFields(Class<?> clazz) {
+        if (cachedVehicleField != null && cachedPassengersField != null) return;
+        for (Field f : clazz.getDeclaredFields()) {
+            if (f.getType() == int.class && cachedVehicleField == null) {
+                f.setAccessible(true);
+                cachedVehicleField = f;
+            } else if (f.getType() == int[].class && cachedPassengersField == null) {
+                f.setAccessible(true);
+                cachedPassengersField = f;
+            }
+        }
+    }
 
     @Override
     public HoloTextDisplay createTextDisplay(List<Player> players, Location location, float yaw, float pitch) {
@@ -125,27 +140,21 @@ public class v26_2 implements Compat {
     }
 
     private void onMountPacketSend(Object msg, Player player) {
-        boolean isPaper = msg.getClass().getName().endsWith("ClientboundSetPassengersPacket");
-        String vehicleFieldName = isPaper ? "vehicle" : "b";
-        String passengersFieldName = isPaper ? "passengers" : "c";
-
         try {
-            Field targetField = msg.getClass().getDeclaredField(vehicleFieldName);
-            targetField.setAccessible(true);
-            int targetID = targetField.getInt(msg);
+            if (cachedVehicleField == null || cachedPassengersField == null) {
+                resolvePassengerFields(msg.getClass());
+            }
+            if (cachedVehicleField == null || cachedPassengersField == null) return;
 
+            int targetID = cachedVehicleField.getInt(msg);
             if (!passengers.containsKey(targetID)) return;
 
-            Field passengersField = msg.getClass().getDeclaredField(passengersFieldName);
-            passengersField.setAccessible(true);
-            int[] passengersID = (int[]) passengersField.get(msg);
+            int[] passengersID = (int[]) cachedPassengersField.get(msg);
+            if (passengersID == null) passengersID = new int[0];
 
             List<Entity> entities = new ArrayList<>(passengers.get(targetID));
-
             int[] newPassengersID = new int[passengersID.length + entities.size()];
-
             System.arraycopy(passengersID, 0, newPassengersID, 0, passengersID.length);
-
 
             int index = passengersID.length;
             for (Entity entity : entities) {
@@ -153,11 +162,7 @@ public class v26_2 implements Compat {
                 newPassengersID[index++] = entityID;
             }
 
-//            if(!player.getName().equals("FavioMC19")){
-//                player.sendMessage("modified array: "+Arrays.toString(newPassengersID));
-//            }
-
-            passengersField.set(msg, newPassengersID);
+            cachedPassengersField.set(msg, newPassengersID);
         } catch (Exception exception) {
             exception.printStackTrace();
         }
@@ -584,22 +589,15 @@ public class v26_2 implements Compat {
             manager.sendPacket(players, itemDisplay);
 
             ClientboundSetPassengersPacket mount = new ClientboundSetPassengersPacket(displayEntity);
-
-            boolean isPaper = mount.getClass().getName().endsWith("ClientboundSetPassengersPacket");
-            String vehicleFieldName = isPaper ? "vehicle" : "b";
-            String passengersFieldName = isPaper ? "passengers" : "c";
-
-            try{
-                Field targetField = mount.getClass().getDeclaredField(vehicleFieldName);
-                targetField.setAccessible(true);
-
-                Field passengersField = mount.getClass().getDeclaredField(passengersFieldName);
-                passengersField.setAccessible(true);
-
-                int[] newPassengersID = new int[]{manager.getEntityID(entity)};
-
-                passengersField.set(mount, newPassengersID);
-            }catch(Exception exception) {
+            try {
+                if (manager.cachedVehicleField == null || manager.cachedPassengersField == null) {
+                    manager.resolvePassengerFields(mount.getClass());
+                }
+                if (manager.cachedPassengersField != null) {
+                    int[] newPassengersID = new int[]{manager.getEntityID(entity)};
+                    manager.cachedPassengersField.set(mount, newPassengersID);
+                }
+            } catch (Exception exception) {
                 exception.printStackTrace();
             }
 

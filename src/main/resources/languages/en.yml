@@ -47,6 +47,8 @@ radar:
 shield:
   deflected: "&bProjectile deflected!"
   cooldown: "&#ff7675HoloShield is on cooldown: &#ffeaa7%ds"
+  activated: "&#00ffaaHoloShield activated!"
+  deactivated: "&#ff7675HoloShield deactivated!"
 
 others:
   config_reloaded: "&aConfiguration reloaded successfully!"

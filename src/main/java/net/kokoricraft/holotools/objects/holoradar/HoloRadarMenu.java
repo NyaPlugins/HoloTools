@@ -40,6 +40,15 @@ public class HoloRadarMenu {
         }
     }
 
+    public static final List<Integer> ORE_SLOTS = List.of(
+            9, 10, 11, 12, 13, 14, 15, 16, 17,
+            19, 20, 21, 22, 23, 24, 25
+    );
+
+    public static int getOreIndex(int rawSlot) {
+        return ORE_SLOTS.indexOf(rawSlot);
+    }
+
     public static void open(Player player) {
         HoloTools plugin = HoloTools.getInstance();
         Inventory inv = Bukkit.createInventory(null, 27, getTitle());
@@ -56,10 +65,10 @@ public class HoloRadarMenu {
         }
 
         List<OreProfile> ores = plugin.getConfigManager().RADAR_ORES;
-        int slot = 10;
 
-        for (OreProfile ore : ores) {
-            if (slot > 16) break;
+        for (int i = 0; i < ores.size() && i < ORE_SLOTS.size(); i++) {
+            OreProfile ore = ores.get(i);
+            int slot = ORE_SLOTS.get(i);
 
             boolean enabled = isOreEnabled(player, ore.key());
             ItemStack item = new ItemStack(ore.icon() != null ? ore.icon() : Material.STONE);

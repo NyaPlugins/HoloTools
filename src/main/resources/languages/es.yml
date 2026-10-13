@@ -47,6 +47,8 @@ radar:
 shield:
   deflected: "&b¡Proyectil desviado!"
   cooldown: "&#ff7675El HoloShield está en enfriamiento: &#ffeaa7%ds"
+  activated: "&#00ffaa¡HoloShield activado!"
+  deactivated: "&#ff7675¡HoloShield desactivado!"
 
 others:
   config_reloaded: "&aConfiguracion recargada con exito!"

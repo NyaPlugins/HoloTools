@@ -302,9 +302,7 @@ public class HoloRadar extends Holo implements HoloBase {
     public void remove(String reason) {
         this.visible = false;
         this.shouldRemove = true;
-        synchronized (activeBlips) {
-            clearDisplays();
-        }
+        clearDisplays();
         super.remove(reason);
     }
 }

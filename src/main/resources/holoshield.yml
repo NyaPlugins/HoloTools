@@ -10,6 +10,31 @@ reflection_speed: 1.5
 sound_enabled: true
 particles_enabled: true
 
+# Base damage reduction (1.0 = 100% blocked, 0.5 = 50% blocked, 0.2 = 20% blocked)
+damage_reduction: 1.0
+
+# Global projectile reflection toggle (if false, projectiles will not be reflected at all)
+reflect_projectiles: true
+
+# Projectile reflection by permission
+# If enabled, only players with at least one matching permission will reflect projectiles.
+reflect_projectiles_by_permission:
+  enabled: false
+  permission: "holotools.holoshield.reflect"
+  permissions:
+    - "holotools.holoshield.reflect"
+    - "holotools.holoshield.reflect.vip"
+
+# Permission-based damage reduction list
+# The highest granted permission will override the profile/default reduction.
+damage_reduction_by_permission:
+  enabled: true
+  permissions:
+    "holotools.holoshield.reduction.100": 1.0
+    "holotools.holoshield.reduction.75": 0.75
+    "holotools.holoshield.reduction.50": 0.50
+    "holotools.holoshield.reduction.20": 0.20
+
 profiles:
   default:
     need_permission: false
@@ -17,6 +42,8 @@ profiles:
     priority: 1
     duration: 10
     cooldown: 25
+    damage_reduction: 1.0
+    reflect_projectiles: true
     color: "#19a7d2"
     color_alpha: 130
     warning_color: "#ff2222"
@@ -27,6 +54,8 @@ profiles:
     priority: 10
     duration: 15
     cooldown: 18
+    damage_reduction: 1.0
+    reflect_projectiles: true
     color: "#00f0ff"
     color_alpha: 140
     warning_color: "#ff1111"

@@ -42,8 +42,14 @@ public abstract class Holo implements Tickable, HoloBase {
     }
 
     public void spawn(Player player) {
+        this.player = player;
         this.initial_yaw = player.getLocation().getYaw();
         slots.values().forEach(slot -> slot.spawn(player));
+        org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (this.visible && player.isOnline()) {
+                slots.values().forEach(slot -> slot.remount(player));
+            }
+        }, 1L);
     }
 
     public void remove(String reason) {

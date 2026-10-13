@@ -60,6 +60,14 @@ public class HaloSlot {
         background.mount(player);
     }
 
+    public void remount(Player player) {
+        if (background != null) {
+            background.mount(player);
+        }
+        itemDisplayMap.values().forEach(d -> d.mount(player));
+        textDisplayMap.values().forEach(d -> d.mount(player));
+    }
+
     public void remove(String reason) {
         if (background != null)
             background.remove();

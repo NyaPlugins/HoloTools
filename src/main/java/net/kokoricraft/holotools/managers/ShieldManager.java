@@ -129,6 +129,61 @@ public class ShieldManager {
         return activeShields.get(player);
     }
 
+    public double getDamageReduction(Player player) {
+        ConfigManager cfg = plugin.getConfigManager();
+        if (cfg.SHIELD_PERM_REDUCTION_ENABLED && !cfg.SHIELD_PERM_REDUCTIONS.isEmpty()) {
+            double highest = -1.0;
+            boolean matched = false;
+            for (Map.Entry<String, Double> entry : cfg.SHIELD_PERM_REDUCTIONS.entrySet()) {
+                if (player.hasPermission(entry.getKey())) {
+                    matched = true;
+                    if (entry.getValue() > highest) {
+                        highest = entry.getValue();
+                    }
+                }
+            }
+            if (matched) {
+                return Math.max(0.0, Math.min(1.0, highest));
+            }
+        }
+
+        ShieldProfile profile = getShieldProfile(player);
+        if (profile != null) {
+            return Math.max(0.0, Math.min(1.0, profile.damageReduction()));
+        }
+
+        return Math.max(0.0, Math.min(1.0, cfg.SHIELD_DEFAULT_DAMAGE_REDUCTION));
+    }
+
+    public boolean canReflectProjectiles(Player player) {
+        ConfigManager cfg = plugin.getConfigManager();
+        if (!cfg.SHIELD_REFLECT_PROJECTILES) {
+            return false;
+        }
+
+        ShieldProfile profile = getShieldProfile(player);
+        if (profile != null && !profile.reflectProjectiles()) {
+            return false;
+        }
+
+        if (cfg.SHIELD_REFLECT_NEED_PERM) {
+            if (cfg.SHIELD_REFLECT_PERMISSIONS != null && !cfg.SHIELD_REFLECT_PERMISSIONS.isEmpty()) {
+                boolean hasAny = false;
+                for (String perm : cfg.SHIELD_REFLECT_PERMISSIONS) {
+                    if (player.hasPermission(perm)) {
+                        hasAny = true;
+                        break;
+                    }
+                }
+                return hasAny;
+            } else if (cfg.SHIELD_REFLECT_PERM != null && !cfg.SHIELD_REFLECT_PERM.isEmpty()) {
+                return player.hasPermission(cfg.SHIELD_REFLECT_PERM);
+            }
+        }
+
+        return true;
+    }
+
     public void onDamageBlocked(Player player) {
         HoloShield shield = activeShields.get(player);
         if (shield != null) {
@@ -154,8 +209,22 @@ public class ShieldManager {
             reflection = projectile.getVelocity().multiply(-mult);
         }
 
+        if (Double.isNaN(reflection.getX()) || reflection.lengthSquared() < 0.001) {
+            reflection = player.getLocation().getDirection().multiply(1.6);
+        }
+
+        try {
+            Location forward = projectile.getLocation().add(reflection.clone().normalize().multiply(0.6));
+            projectile.teleport(forward);
+        } catch (Exception ignored) {}
+
         projectile.setVelocity(reflection);
         projectile.setShooter(player);
+
+        String msg = plugin.getLangManager().SHIELD_DEFLECTED;
+        if (!msg.isBlank()) {
+            player.sendMessage(plugin.getUtils().color(msg));
+        }
 
         Location impact = projectile.getLocation();
         World world = player.getWorld();

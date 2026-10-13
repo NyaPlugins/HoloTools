@@ -3,6 +3,7 @@ package net.kokoricraft.holotools.objects.holoshield;
 import net.kokoricraft.holotools.HoloTools;
 import net.kokoricraft.holotools.utils.objects.HoloColor;
 import net.kokoricraft.holotools.version.HoloTextDisplay;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -60,6 +61,11 @@ public class HoloShield {
         spawnFace(players, loc, baseYaw, 0, yCenter - radius + eps, 0, -90f, 0, 0);
 
         active = true;
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (active && player.isOnline()) {
+                displays.forEach(d -> d.mount(player));
+            }
+        }, 1L);
     }
 
     private void spawnFace(List<Player> players, Location loc, float yaw, float targetX, float targetY, float targetZ, float rx, float ry, float rz) {

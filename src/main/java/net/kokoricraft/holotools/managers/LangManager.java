@@ -52,6 +52,8 @@ public class LangManager {
     public String RADAR_FILTER_ENABLE_CLICK;
     public String SHIELD_DEFLECTED;
     public String SHIELD_COOLDOWN;
+    public String SHIELD_ACTIVATED;
+    public String SHIELD_DEACTIVATED;
 
     public LangManager(HoloTools plugin){
         this.plugin = plugin;
@@ -104,6 +106,8 @@ public class LangManager {
 
         SHIELD_DEFLECTED = getStringWithDefault(messages, "shield.deflected");
         SHIELD_COOLDOWN = getStringWithDefault(messages, "shield.cooldown");
+        SHIELD_ACTIVATED = getStringWithDefault(messages, "shield.activated");
+        SHIELD_DEACTIVATED = getStringWithDefault(messages, "shield.deactivated");
 
         NO_PERMISSION = getStringWithDefault(messages, "others.no_permission");
         CONFIG_RELOADED = getStringWithDefault(messages, "others.config_reloaded");

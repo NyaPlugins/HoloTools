@@ -12,6 +12,8 @@ import net.kokoricraft.holotools.objects.NekoConfig;
 import net.kokoricraft.holotools.objects.NekoItem;
 import net.kokoricraft.holotools.objects.colors.HoloPanelsColors;
 import net.kokoricraft.holotools.objects.holobridge.BridgeProfile;
+import net.kokoricraft.holotools.objects.holoradar.OreProfile;
+import net.kokoricraft.holotools.objects.holoshield.ShieldProfile;
 import net.kokoricraft.holotools.utils.objects.HoloColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -20,6 +22,7 @@ import org.bukkit.enchantments.Enchantment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,11 +45,18 @@ public class ConfigManager {
     public NekoItem BRIDGE_ITEM;
     public int BRIDGE_DURATION = 30;
 
-    public List<net.kokoricraft.holotools.objects.holoshield.ShieldProfile> shieldProfiles = new ArrayList<>();
+    public List<ShieldProfile> shieldProfiles = new ArrayList<>();
     public NekoItem SHIELD_ITEM;
     public double SHIELD_SPEED = 1.5;
     public boolean SHIELD_SOUND = true;
     public boolean SHIELD_PARTICLES = true;
+    public double SHIELD_DEFAULT_DAMAGE_REDUCTION = 1.0;
+    public boolean SHIELD_REFLECT_PROJECTILES = true;
+    public boolean SHIELD_REFLECT_NEED_PERM = false;
+    public String SHIELD_REFLECT_PERM = "holotools.holoshield.reflect";
+    public List<String> SHIELD_REFLECT_PERMISSIONS = new ArrayList<>();
+    public boolean SHIELD_PERM_REDUCTION_ENABLED = false;
+    public Map<String, Double> SHIELD_PERM_REDUCTIONS = new LinkedHashMap<>();
 
     public NekoItem WAYPOINT_ITEM;
     public List<HoloPanelsColors> WAYPOINT_PANELS_COLORS;
@@ -56,7 +66,7 @@ public class ConfigManager {
     public int RADAR_SCAN_INTERVAL = 20;
     public HoloColor RADAR_DEFAULT_UNSELECTED;
     public HoloColor RADAR_DEFAULT_SELECTED;
-    public List<net.kokoricraft.holotools.objects.holoradar.OreProfile> RADAR_ORES = new ArrayList<>();
+    public List<OreProfile> RADAR_ORES = new ArrayList<>();
 
     public static final DualColor DUAL_COLOR_DEF = new DualColor(HoloColors.WHITE.getColor(), HoloColors.WHITE_SELECTED.getColor());
 
@@ -154,6 +164,29 @@ public class ConfigManager {
         SHIELD_SPEED = shield.getDouble("reflection_speed", 1.5);
         SHIELD_SOUND = shield.getBoolean("sound_enabled", true);
         SHIELD_PARTICLES = shield.getBoolean("particles_enabled", true);
+        SHIELD_DEFAULT_DAMAGE_REDUCTION = shield.getDouble("damage_reduction", 1.0);
+        SHIELD_REFLECT_PROJECTILES = shield.getBoolean("reflect_projectiles", true);
+        SHIELD_REFLECT_NEED_PERM = shield.getBoolean("reflect_projectiles_by_permission.enabled",
+                shield.getBoolean("reflect_projectiles_need_permission", false));
+        SHIELD_REFLECT_PERM = shield.getString("reflect_projectiles_by_permission.permission",
+                shield.getString("reflect_projectiles_permission", "holotools.holoshield.reflect"));
+        SHIELD_REFLECT_PERMISSIONS.clear();
+        List<String> reflectPerms = shield.getStringList("reflect_projectiles_by_permission.permissions");
+        if (reflectPerms != null && !reflectPerms.isEmpty()) {
+            SHIELD_REFLECT_PERMISSIONS.addAll(reflectPerms);
+        } else if (SHIELD_REFLECT_PERM != null && !SHIELD_REFLECT_PERM.isEmpty()) {
+            SHIELD_REFLECT_PERMISSIONS.add(SHIELD_REFLECT_PERM);
+        }
+
+        SHIELD_PERM_REDUCTIONS.clear();
+        SHIELD_PERM_REDUCTION_ENABLED = shield.getBoolean("damage_reduction_by_permission.enabled", false);
+        ConfigurationSection permSec = shield.getConfigurationSection("damage_reduction_by_permission.permissions");
+        if (permSec != null) {
+            for (String perm : permSec.getKeys(false)) {
+                SHIELD_PERM_REDUCTIONS.put(perm, permSec.getDouble(perm, 1.0));
+            }
+        }
+
         shieldProfiles.clear();
         ConfigurationSection shieldProfilesSec = shield.getConfigurationSection("profiles");
         if (shieldProfilesSec != null) {
@@ -163,13 +196,17 @@ public class ConfigManager {
                 int priority = shieldProfilesSec.getInt(key + ".priority", 0);
                 int duration = shieldProfilesSec.getInt(key + ".duration", 10);
                 int cooldown = shieldProfilesSec.getInt(key + ".cooldown", 25);
+                double damageReduction = shieldProfilesSec.getDouble(key + ".damage_reduction", SHIELD_DEFAULT_DAMAGE_REDUCTION);
+                boolean reflectProjectiles = shieldProfilesSec.getBoolean(key + ".reflect_projectiles", SHIELD_REFLECT_PROJECTILES);
                 String hex = shieldProfilesSec.getString(key + ".color", "#19a7d2");
                 int alpha = shieldProfilesSec.getInt(key + ".color_alpha", 130);
                 String warnHex = shieldProfilesSec.getString(key + ".warning_color", "#ff2222");
                 int warnAlpha = shieldProfilesSec.getInt(key + ".warning_alpha", 170);
                 HoloColor color = HoloColor.fromHex(hex, alpha);
                 HoloColor warnColor = HoloColor.fromHex(warnHex, warnAlpha);
-                shieldProfiles.add(new net.kokoricraft.holotools.objects.holoshield.ShieldProfile(needPermission, permission, priority, duration, cooldown, color, warnColor));
+                shieldProfiles.add(new ShieldProfile(
+                        needPermission, permission, priority, duration, cooldown, damageReduction, reflectProjectiles, color, warnColor
+                ));
             }
             shieldProfiles.sort((a, b) -> Integer.compare(b.priority(), a.priority()));
         }
@@ -219,7 +256,7 @@ public class ConfigManager {
                         mats.add(Material.valueOf(m.toUpperCase()));
                     } catch (Exception ignored) {}
                 }
-                RADAR_ORES.add(new net.kokoricraft.holotools.objects.holoradar.OreProfile(key, name, icon, priority, color, mats));
+                RADAR_ORES.add(new OreProfile(key, name, icon, priority, color, mats));
             }
             RADAR_ORES.sort((a, b) -> Integer.compare(b.priority(), a.priority()));
         }

@@ -83,7 +83,7 @@ public class HoloWaypoint extends Holo implements HoloBase {
             HoloTextDisplay display = markerDisplays.get(wp.getSlot());
             if (display == null) {
                 if (!visible || shouldRemove) return;
-                List<Player> players = plugin.getManager().getHoloPlayerView(player);
+                List<Player> players = List.of(player);
                 display = plugin.getCompatManager().getCompat().createTextDisplay(
                         players, player.getLocation(), 0, initial_yaw + 180.0f
                 );
@@ -192,14 +192,12 @@ public class HoloWaypoint extends Holo implements HoloBase {
     public void remove(String reason) {
         this.visible = false;
         this.shouldRemove = true;
-        synchronized (markerDisplays) {
-            for (HoloTextDisplay display : markerDisplays.values()) {
-                if (display != null) {
-                    display.remove();
-                }
+        for (HoloTextDisplay display : markerDisplays.values()) {
+            if (display != null) {
+                display.remove();
             }
-            markerDisplays.clear();
         }
+        markerDisplays.clear();
         super.remove(reason);
     }
 }

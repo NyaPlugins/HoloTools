@@ -2,17 +2,19 @@ package net.kokoricraft.holotools.listeners;
 
 import net.kokoricraft.holotools.HoloTools;
 import net.kokoricraft.holotools.managers.ShieldManager;
+import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.*;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 public class HoloShieldListener implements Listener {
@@ -24,30 +26,72 @@ public class HoloShieldListener implements Listener {
         this.shieldManager = plugin.getShieldManager();
     }
 
-    @EventHandler
-    public void onSlotChange(PlayerItemHeldEvent event) {
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onInteract(PlayerInteractEvent event) {
+        Action action = event.getAction();
+        if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) return;
+
         Player player = event.getPlayer();
-        ItemStack item = player.getInventory().getItem(event.getNewSlot());
-        if (shieldManager.isHoloShield(item)) {
-            if (shieldManager.canActivate(player)) {
-                shieldManager.startShield(player);
-            } else if (shieldManager.isOnCooldown(player)) {
+        ItemStack item = event.getItem();
+
+        if (event.getHand() == EquipmentSlot.OFF_HAND && shieldManager.isHoloShield(player.getInventory().getItemInMainHand())) {
+            return;
+        }
+
+        if (!shieldManager.isHoloShield(item)) return;
+
+        event.setCancelled(true);
+
+        if (shieldManager.hasActiveShield(player)) {
+            shieldManager.stopShield(player);
+            player.sendMessage(plugin.getUtils().color(plugin.getLangManager().SHIELD_DEACTIVATED));
+        } else {
+            if (shieldManager.isOnCooldown(player)) {
                 int rem = shieldManager.getRemainingCooldown(player);
                 player.sendMessage(plugin.getUtils().color(String.format(plugin.getLangManager().SHIELD_COOLDOWN, rem)));
+                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.7f, 1.0f);
+            } else {
+                shieldManager.startShield(player);
+                player.sendMessage(plugin.getUtils().color(plugin.getLangManager().SHIELD_ACTIVATED));
             }
         }
     }
 
     @EventHandler
+    public void onSlotChange(PlayerItemHeldEvent event) {
+        Player player = event.getPlayer();
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            if (!player.isOnline()) return;
+            if (shieldManager.hasActiveShield(player) && !shieldManager.isHoldingShield(player)) {
+                shieldManager.stopShield(player);
+                player.sendMessage(plugin.getUtils().color(plugin.getLangManager().SHIELD_DEACTIVATED));
+            }
+        });
+    }
+
+    @EventHandler
     public void onSwapHand(PlayerSwapHandItemsEvent event) {
         Player player = event.getPlayer();
-        if (shieldManager.isHoloShield(event.getMainHandItem()) || shieldManager.isHoloShield(event.getOffHandItem())) {
-            if (shieldManager.canActivate(player)) {
-                shieldManager.startShield(player);
-            } else if (shieldManager.isOnCooldown(player)) {
-                int rem = shieldManager.getRemainingCooldown(player);
-                player.sendMessage(plugin.getUtils().color(String.format(plugin.getLangManager().SHIELD_COOLDOWN, rem)));
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            if (!player.isOnline()) return;
+            if (shieldManager.hasActiveShield(player) && !shieldManager.isHoldingShield(player)) {
+                shieldManager.stopShield(player);
+                player.sendMessage(plugin.getUtils().color(plugin.getLangManager().SHIELD_DEACTIVATED));
             }
+        });
+    }
+
+    @EventHandler
+    public void onDropItem(PlayerDropItemEvent event) {
+        Player player = event.getPlayer();
+        if (shieldManager.isHoloShield(event.getItemDrop().getItemStack())) {
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                if (!player.isOnline()) return;
+                if (shieldManager.hasActiveShield(player) && !shieldManager.isHoldingShield(player)) {
+                    shieldManager.stopShield(player);
+                    player.sendMessage(plugin.getUtils().color(plugin.getLangManager().SHIELD_DEACTIVATED));
+                }
+            });
         }
     }
 
@@ -65,13 +109,23 @@ public class HoloShieldListener implements Listener {
             return;
         }
 
-        event.setCancelled(true);
-        shieldManager.onDamageBlocked(player);
-
         if (event instanceof EntityDamageByEntityEvent byEntityEvent) {
             if (byEntityEvent.getDamager() instanceof Projectile projectile) {
-                shieldManager.reflectProjectile(player, projectile);
+                if (shieldManager.canReflectProjectiles(player)) {
+                    shieldManager.reflectProjectile(player, projectile);
+                }
             }
+        }
+
+        double reduction = shieldManager.getDamageReduction(player);
+        if (reduction >= 1.0) {
+            event.setCancelled(true);
+            shieldManager.onDamageBlocked(player);
+        } else if (reduction > 0.0) {
+            double currentDamage = event.getDamage();
+            double newDamage = Math.max(0.0, currentDamage * (1.0 - reduction));
+            event.setDamage(newDamage);
+            shieldManager.onDamageBlocked(player);
         }
     }
 
